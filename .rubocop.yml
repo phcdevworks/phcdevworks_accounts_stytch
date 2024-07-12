@@ -1,0 +1,61 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rake
+
+AllCops:
+  Exclude:
+    - "db/schema.rb"
+    - "db/migrate/**/*"
+    - "bin/**/*"
+    - "node_modules/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+
+Lint/RedundantCopDisableDirective:
+  Enabled: true
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+
+Style/Documentation:
+  Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - "db/schema.rb"
+    - "db/migrate/**/*"
+    - "Gemfile"
+    - "Guardfile"
+    - "Rakefile"
+    - "config.ru"
+    - "package.json"
+    - "*.yml"
+    - "*.md"
+
+Layout/EndOfLine:
+  EnforcedStyle: lf
+  AutoCorrect: true
+
+Layout/LineLength:
+  Max: 120
+  AllowHeredoc: true
+  AllowURI: true
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/AbcSize:
+  Max: 10
+
+Metrics/ClassLength:
+  Max: 100
+
+Metrics/LineLength:
+  Max: 120
+
+# RSpec-specific configurations
+RSpec:
+  MultipleExpectations:
+    Enabled: false
