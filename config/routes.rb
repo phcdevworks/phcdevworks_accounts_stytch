@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 PhcdevworksAccountsStytch::Engine.routes.draw do
-  post 'login', to: 'authentication#login'
-  get 'authenticate', to: 'authentication#authenticate'
+  namespace :authentication do
+    post 'login', to: 'login#create'
+    post 'process', to: 'processor#create'
+  end
 end
