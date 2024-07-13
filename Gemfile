@@ -10,6 +10,7 @@ group :development, :test do
   gem 'bundler', '~> 2.5'
   gem 'rake', '~> 13.2'
   gem 'rspec', '~> 3.13'
+  gem 'rspec-rails', '~> 6.1'
   gem 'rubocop', '~> 1.64', require: false
   gem 'rubocop-performance', '~> 1.21', require: false
   gem 'rubocop-rake', '~> 0.6.0', require: false
