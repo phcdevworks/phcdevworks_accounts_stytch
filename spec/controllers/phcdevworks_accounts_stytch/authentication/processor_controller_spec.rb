@@ -3,6 +3,16 @@
 require 'rails_helper'
 require 'stytch' # Ensure the Stytch library is loaded
 
+# Define FakeResponse outside of the RSpec block
+class FakeResponse
+  attr_reader :email_address, :intermediate_session_token
+
+  def initialize(email_address:, intermediate_session_token:)
+    @email_address = email_address
+    @intermediate_session_token = intermediate_session_token
+  end
+end
+
 module PhcdevworksAccountsStytch
   module Authentication
     RSpec.describe ProcessorController, type: :controller do
@@ -11,8 +21,11 @@ module PhcdevworksAccountsStytch
       describe 'POST #create' do
         let(:token) { 'some-token' }
         let(:response_body) do
-          instance_double(Response, email_address: 'test@example.com',
-                                    intermediate_session_token: 'intermediate-token')
+          instance_double(
+            FakeResponse,
+            email_address: 'test@example.com',
+            intermediate_session_token: 'intermediate-token'
+          )
         end
         let(:client) { instance_double(StytchB2B::Client) }
         let(:magic_links) { instance_double(StytchB2B::MagicLinks) }

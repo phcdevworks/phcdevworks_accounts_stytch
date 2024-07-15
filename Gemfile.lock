@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    phcdevworks_accounts_stytch (0.1.0)
+    phcdevworks_accounts_stytch (0.1.0.pre.1)
       rails (>= 7.1.3.4)
       stytch (~> 9.1)
 
