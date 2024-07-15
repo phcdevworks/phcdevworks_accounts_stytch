@@ -8,8 +8,7 @@ module PhcdevworksAccountsStytch
       include StytchClient
 
       def create
-        token = params[:token]
-        response = authenticate_token(token)
+        response = process_authentication
         render_success(response)
       rescue StandardError => e
         render_error(e)
@@ -17,8 +16,30 @@ module PhcdevworksAccountsStytch
 
       private
 
-      def authenticate_token(token)
+      def process_authentication
+        if magic_link_authentication?
+          authenticate_magic_link(params[:magic_link_token])
+        elsif google_authentication?
+          authenticate_google(params[:google_token])
+        else
+          raise 'No authentication method provided'
+        end
+      end
+
+      def magic_link_authentication?
+        params[:magic_link_token].present?
+      end
+
+      def google_authentication?
+        params[:google_token].present?
+      end
+
+      def authenticate_magic_link(token)
         stytch_client.magic_links.discovery.authenticate(discovery_magic_links_token: token)
+      end
+
+      def authenticate_google(token)
+        google_client.verify_id_token(id_token: token)
       end
 
       def render_success(response)
