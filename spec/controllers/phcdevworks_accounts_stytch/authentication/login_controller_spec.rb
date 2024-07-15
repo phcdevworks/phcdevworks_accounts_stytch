@@ -12,14 +12,14 @@ module PhcdevworksAccountsStytch
         let(:email) { 'test@example.com' }
         let(:response_body) { { 'message' => 'Magic link sent' } }
         let(:client) { instance_double(StytchB2B::Client) }
-        let(:magic_links) { instance_double(MagicLinks) }
-        let(:email_instance) { instance_double(Email) }
+        let(:magic_links) { instance_double(StytchB2B::MagicLinks) }
+        let(:email_discovery) { instance_double(StytchB2B::MagicLinks::Email) }
 
         before do
           allow(controller).to receive(:stytch_client).and_return(client)
           allow(client).to receive(:magic_links).and_return(magic_links)
-          allow(magic_links).to receive(:email).and_return(email_instance)
-          allow(email_instance).to receive_messages(discovery: email_instance, send: response_body)
+          allow(magic_links).to receive(:email).and_return(email_discovery)
+          allow(email_discovery).to receive_messages(discovery: email_discovery, send: response_body)
         end
 
         it 'returns a successful status' do
