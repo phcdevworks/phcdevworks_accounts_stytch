@@ -98,6 +98,10 @@ GEM
     crass (1.0.6)
     date (3.3.4)
     diff-lcs (1.5.1)
+    dotenv (3.1.2)
+    dotenv-rails (3.1.2)
+      dotenv (= 3.1.2)
+      railties (>= 6.1)
     drb (2.2.1)
     erubi (1.13.0)
     faraday (2.10.0)
@@ -306,6 +310,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 2.5)
+  dotenv-rails (~> 3.1)
   phcdevworks_accounts_stytch!
   rake (~> 13.2)
   rspec (~> 3.13)

@@ -10,3 +10,4 @@
 spec/dummy/log/*
 .rspec_status
 /spec/vcr_cassettes/
+.env

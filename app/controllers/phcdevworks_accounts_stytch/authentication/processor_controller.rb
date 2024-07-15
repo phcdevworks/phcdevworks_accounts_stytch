@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'phcdevworks_accounts_stytch/stytch_client'
+
 module PhcdevworksAccountsStytch
   module Authentication
     class ProcessorController < ApplicationController

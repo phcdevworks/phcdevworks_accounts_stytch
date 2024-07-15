@@ -8,6 +8,7 @@ gemspec
 
 group :development, :test do
   gem 'bundler', '~> 2.5'
+  gem 'dotenv-rails', '~> 3.1'
   gem 'rake', '~> 13.2'
   gem 'rspec', '~> 3.13'
   gem 'rspec-rails', '~> 6.1'

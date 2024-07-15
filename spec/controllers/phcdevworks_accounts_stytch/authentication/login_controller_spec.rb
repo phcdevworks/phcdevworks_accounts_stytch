@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'stytch' # Ensure the Stytch library is loaded
+require 'stytch'
 
 module PhcdevworksAccountsStytch
   module Authentication

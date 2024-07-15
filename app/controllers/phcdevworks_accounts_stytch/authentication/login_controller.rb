@@ -1,4 +1,3 @@
-# app/controllers/phcdevworks_accounts_stytch/authentication/login_controller.rb
 # frozen_string_literal: true
 
 require 'phcdevworks_accounts_stytch/stytch_client'

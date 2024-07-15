@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'stytch'
+
 module StytchClient
   def stytch_client
     @stytch_client ||= StytchB2B::Client.new(
