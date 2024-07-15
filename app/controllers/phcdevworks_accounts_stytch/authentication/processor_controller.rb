@@ -30,8 +30,8 @@ module PhcdevworksAccountsStytch
       end
 
       def success_message(response)
-        "Hello, #{response.email_address}! Complete the Discovery flow by creating an " \
-        "Organization with your intermediate session token: #{response.intermediate_session_token}."
+        "Hello, #{response['email_address']}! Complete the Discovery flow by creating an " \
+        "Organization with your intermediate session token: #{response['intermediate_session_token']}."
       end
     end
   end
