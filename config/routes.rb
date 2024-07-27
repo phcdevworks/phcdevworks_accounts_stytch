@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 PhcdevworksAccountsStytch::Engine.routes.draw do
-  post 'login', to: 'authentication/login#create'
-  get 'authenticate', to: 'authentication/processor#create'
+  namespace :authentication do
+    get 'auth/google', to: 'sessions#google_login', as: 'google_login'
+    get 'auth/google/callback', to: 'sessions#google_callback', as: 'google_callback'
+  end
 end
