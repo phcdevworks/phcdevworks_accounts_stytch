@@ -26,6 +26,13 @@ module PhcdevworksAccountsStytch
         StytchClient.b2b_client
       end
 
+      it 'returns the same instance on subsequent calls' do
+        client = double('StytchB2B::Client')
+        allow(StytchB2B::Client).to receive(:new).and_return(client)
+        expect(StytchClient.b2b_client).to eq(client)
+        expect(StytchClient.b2b_client).to eq(client)
+      end
+
       it 'raises an error if B2B credentials are missing' do
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :project_id).and_return(nil)
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :secret).and_return(nil)
@@ -38,6 +45,13 @@ module PhcdevworksAccountsStytch
       it 'initializes the B2C client with correct credentials' do
         expect(Stytch::Client).to receive(:new).with(project_id: b2c_project_id, secret: b2c_secret)
         StytchClient.b2c_client
+      end
+
+      it 'returns the same instance on subsequent calls' do
+        client = double('Stytch::Client')
+        allow(Stytch::Client).to receive(:new).and_return(client)
+        expect(StytchClient.b2c_client).to eq(client)
+        expect(StytchClient.b2c_client).to eq(client)
       end
 
       it 'raises an error if B2C credentials are missing' do
