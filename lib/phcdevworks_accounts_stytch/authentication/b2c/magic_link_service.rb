@@ -2,7 +2,7 @@
 
 module PhcdevworksAccountsStytch
   module Authentication
-    module B2C
+    module B2c
       class MagicLinkService
         def initialize
           @client = PhcdevworksAccountsStytch::StytchClient.b2c_client

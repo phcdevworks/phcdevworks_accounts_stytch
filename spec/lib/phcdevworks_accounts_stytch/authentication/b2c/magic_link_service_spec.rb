@@ -1,5 +1,3 @@
-# spec/lib/phcdevworks_accounts_stytch/authentication/b2_c/magic_link_service_spec.rb
-
 # frozen_string_literal: true
 
 require 'rails_helper'
@@ -9,7 +7,7 @@ module Stytch
   class Error < StandardError; end
 end
 
-RSpec.describe PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService, type: :service do
+RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService, type: :service do
   let(:client) { instance_double(Stytch::Client) }
   let(:magic_links_email) { instance_double(Stytch::MagicLinks::Email) }
   let(:email) { 'user@example.com' }

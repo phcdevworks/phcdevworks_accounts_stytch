@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PhcdevworksAccountsStytch
-  module B2B
+  module B2b
     class MagicLinksController < ApplicationController
       def invite
         service = PhcdevworksAccountsStytch::Authentication::B2B::MagicLinkService.new

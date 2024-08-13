@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PhcdevworksAccountsStytch
-  module B2C
+  module B2c
     class MagicLinksController < ApplicationController
       def login_or_create
         service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
