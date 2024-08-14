@@ -4,7 +4,7 @@ module PhcdevworksAccountsStytch
   module B2b
     class MagicLinksController < ApplicationController
       def invite
-        service = PhcdevworksAccountsStytch::Authentication::B2B::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService.new
         result = service.invite(params[:email], params[:organization_id])
 
         if result
@@ -15,7 +15,7 @@ module PhcdevworksAccountsStytch
       end
 
       def authenticate
-        service = PhcdevworksAccountsStytch::Authentication::B2B::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService.new
         result = service.authenticate(params[:token])
 
         if result

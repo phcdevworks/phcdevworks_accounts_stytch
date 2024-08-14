@@ -4,7 +4,7 @@ module PhcdevworksAccountsStytch
   module B2c
     class MagicLinksController < ApplicationController
       def login_or_create
-        service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
         result = service.login_or_create(params[:email])
 
         if result
@@ -16,7 +16,7 @@ module PhcdevworksAccountsStytch
       end
 
       def send_magic_link
-        service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
         result = service.send_magic_link(params[:email])
 
         if result
@@ -27,7 +27,7 @@ module PhcdevworksAccountsStytch
       end
 
       def invite
-        service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
         result = service.invite(params[:email])
 
         if result
@@ -38,7 +38,7 @@ module PhcdevworksAccountsStytch
       end
 
       def revoke_invite
-        service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
         result = service.revoke_invite(params[:email])
 
         if result
@@ -49,7 +49,7 @@ module PhcdevworksAccountsStytch
       end
 
       def authenticate
-        service = PhcdevworksAccountsStytch::Authentication::B2C::MagicLinkService.new
+        service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
         result = service.authenticate(params[:token])
 
         if result
