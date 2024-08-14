@@ -55,6 +55,9 @@ Metrics/ClassLength:
 Metrics/LineLength:
   Max: 120
 
+AllCops:
+  SuggestExtensions: false
+
 # RSpec-specific configurations
 RSpec:
   MultipleExpectations:
