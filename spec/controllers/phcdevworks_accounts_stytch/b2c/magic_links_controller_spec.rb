@@ -20,8 +20,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :login_or_create, params: { email: email }, format: :json
       end
 
-      it 'returns a success response' do
+      it 'returns a success status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct user_id' do
         expect(JSON.parse(response.body)['user_id']).to eq('user_123')
       end
     end
@@ -32,7 +35,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :login_or_create, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity response' do
+      it 'returns an unprocessable entity status' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -45,8 +48,12 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :send_magic_link, params: { email: email }, format: :json
       end
 
-      it 'returns a success response' do
+      it 'returns a success status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct message' do
+        expect(JSON.parse(response.body)['message']).to eq('Magic link sent successfully.')
       end
     end
 
@@ -56,7 +63,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :send_magic_link, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity response' do
+      it 'returns an unprocessable entity status' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -69,8 +76,12 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :invite, params: { email: email }, format: :json
       end
 
-      it 'returns a success response' do
+      it 'returns a success status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct message' do
+        expect(JSON.parse(response.body)['message']).to eq('Invite sent successfully.')
       end
     end
 
@@ -80,7 +91,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :invite, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity response' do
+      it 'returns an unprocessable entity status' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -93,8 +104,12 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :revoke_invite, params: { email: email }, format: :json
       end
 
-      it 'returns a success response' do
+      it 'returns a success status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct message' do
+        expect(JSON.parse(response.body)['message']).to eq('Invite revoked successfully.')
       end
     end
 
@@ -104,7 +119,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :revoke_invite, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity response' do
+      it 'returns an unprocessable entity status' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -117,8 +132,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :authenticate, params: { token: token }, format: :json
       end
 
-      it 'returns a success response' do
+      it 'returns a success status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the correct user_id' do
         expect(JSON.parse(response.body)['user_id']).to eq('user_123')
       end
     end
@@ -129,7 +147,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         post :authenticate, params: { token: token }, format: :json
       end
 
-      it 'returns an unprocessable entity response' do
+      it 'returns an unprocessable entity status' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
