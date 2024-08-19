@@ -8,10 +8,22 @@ module PhcdevworksAccountsStytch
           @client = PhcdevworksAccountsStytch::StytchClient.b2b_client
         end
 
-        def invite(email, organization_id)
-          @client.magic_links.email.invite(
+        def login_or_signup(email, organization_id)
+          @client.magic_links.email.login_or_signup(
             organization_id: organization_id,
             email_address: email
+          )
+        rescue Stytch::Error => e
+          handle_error(e)
+        end
+
+        def invite(email, organization_id, session_token)
+          @client.magic_links.email.invite(
+            organization_id: organization_id,
+            email_address: email,
+            method_options: {
+              authorization: { session_token: session_token }
+            }
           )
         rescue Stytch::Error => e
           handle_error(e)

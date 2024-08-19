@@ -3,9 +3,20 @@
 module PhcdevworksAccountsStytch
   module B2b
     class MagicLinksController < ApplicationController
+      def login_or_signup
+        service = PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService.new
+        result = service.login_or_signup(params[:email], params[:organization_id])
+
+        if result
+          render json: { message: 'Magic link sent successfully for login or signup.' }, status: :ok
+        else
+          render json: { error: 'Failed to send magic link for login or signup.' }, status: :unprocessable_entity
+        end
+      end
+
       def invite
         service = PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService.new
-        result = service.invite(params[:email], params[:organization_id])
+        result = service.invite(params[:email], params[:organization_id], params[:session_token])
 
         if result
           render json: { message: 'Invite sent successfully.' }, status: :ok

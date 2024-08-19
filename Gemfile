@@ -9,6 +9,9 @@ gemspec
 group :development, :test do
   gem 'bundler', '~> 2.5'
   gem 'dotenv-rails', '~> 3.1'
+  gem 'factory_bot', '~> 6.4', '>= 6.4.6'
+  gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3'
+  gem 'faker', '~> 3.4', '>= 3.4.2'
   gem 'rake', '~> 13.2'
   gem 'rspec', '~> 3.13'
   gem 'rspec-rails', '~> 6.1'

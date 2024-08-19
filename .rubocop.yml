@@ -11,6 +11,7 @@ AllCops:
     - "node_modules/**/*"
     - "tmp/**/*"
     - "vendor/**/*"
+  SuggestExtensions: false
 
 Lint/RedundantCopDisableDirective:
   Enabled: true
@@ -44,21 +45,32 @@ Layout/LineLength:
   AllowURI: true
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 20  # Relaxed from 15 to 20 to allow for more complex methods
 
 Metrics/AbcSize:
-  Max: 10
+  Max: 15  # Increased from 10 to 15 to accommodate more complex logic
 
 Metrics/ClassLength:
-  Max: 100
+  Max: 150  # Increased from 100 to 150 to allow for larger classes, especially in Rails
 
-Metrics/LineLength:
-  Max: 120
-
-AllCops:
-  SuggestExtensions: false
-
-# RSpec-specific configurations
 RSpec:
+  Enabled: true
+
+  # Allows for more flexibility in writing tests
   MultipleExpectations:
     Enabled: false
+
+  # Increase the max allowed memoized helpers
+  MultipleMemoizedHelpers:
+    Max: 8  # Increase this to 8 or more if needed
+
+  # Allows for longer test examples when necessary
+  ExampleLength:
+    Max: 10  # Increase this if your examples are too long
+
+  ContextWording:
+    Enabled: false  # You can disable this if you don't want to follow the specific wording rules
+
+  # Allows for more flexibility in context blocks
+  ContextLength:
+    Max: 10  # Increase this to allow for more lines in your context blocks

@@ -11,6 +11,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   let(:client) { instance_double(StytchB2B::Client) }
   let(:email) { 'user@example.com' }
   let(:organization_id) { 'org_123' }
+  let(:session_token) { 'some_session_token' } # Define session_token here
   let(:token) { 'some_valid_token' }
   let(:service) { described_class.new }
 
@@ -24,20 +25,28 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
     context 'when invite is successful' do
       it 'returns true' do
         allow(client.magic_links.email).to receive(:invite)
-          .with(organization_id: organization_id, email_address: email)
+          .with(
+            organization_id: organization_id,
+            email_address: email,
+            method_options: { authorization: { session_token: session_token } }
+          )
           .and_return(true)
 
-        expect(service.invite(email, organization_id)).to be_truthy
+        expect(service.invite(email, organization_id, session_token)).to be_truthy
       end
     end
 
     context 'when invite fails' do
       it 'handles the error and returns nil' do
         allow(client.magic_links.email).to receive(:invite)
-          .with(organization_id: organization_id, email_address: email)
+          .with(
+            organization_id: organization_id,
+            email_address: email,
+            method_options: { authorization: { session_token: session_token } }
+          )
           .and_raise(Stytch::Error.new('Invite error'))
 
-        expect(service.invite(email, organization_id)).to be_nil
+        expect(service.invite(email, organization_id, session_token)).to be_nil
       end
     end
   end
