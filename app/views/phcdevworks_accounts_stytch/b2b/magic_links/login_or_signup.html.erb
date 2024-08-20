@@ -1,0 +1,17 @@
+<h1>Login or Sign Up with Magic Link</h1>
+
+<%= form_with url: b2b_magic_links_login_or_signup_path, local: true do |form| %>
+  <div class="field">
+    <%= form.label :email, "Your Email" %><br>
+    <%= form.email_field :email, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :organization_id, "Organization ID" %><br>
+    <%= form.text_field :organization_id, required: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Send Magic Link" %>
+  </div>
+<% end %>

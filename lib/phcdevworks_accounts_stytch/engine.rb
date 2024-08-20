@@ -8,5 +8,6 @@ module PhcdevworksAccountsStytch
       PhcdevworksAccountsStytch::StytchClient.b2b_client
       PhcdevworksAccountsStytch::StytchClient.b2c_client
     end
+    config.autoload_paths += %W[#{config.root}/lib]
   end
 end

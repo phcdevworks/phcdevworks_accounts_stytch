@@ -38,24 +38,26 @@ module PhcdevworksAccountsStytch
         expect(first_call).to eq(second_call)
       end
 
-      it 'raises an error if B2B credentials are missing' do
+      it 'raises a custom error if B2B credentials are missing' do
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :project_id).and_return(nil)
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :secret).and_return(nil)
 
-        expect { described_class.b2b_client }.to raise_error('Stytch B2B credentials are missing')
+        expect do
+          described_class.b2b_client
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error, /Stytch B2B credentials are missing/)
       end
     end
 
     describe '.b2c_client' do
-      let(:client) { instance_double(Stytch::Client) }
+      let(:client) { instance_double(::Stytch::Client) }
 
       before do
-        allow(Stytch::Client).to receive(:new).and_return(client)
+        allow(::Stytch::Client).to receive(:new).and_return(client)
       end
 
       it 'initializes the B2C client with correct credentials' do
         described_class.b2c_client
-        expect(Stytch::Client).to have_received(:new).with(project_id: b2c_project_id, secret: b2c_secret)
+        expect(::Stytch::Client).to have_received(:new).with(project_id: b2c_project_id, secret: b2c_secret)
       end
 
       it 'returns the same instance on subsequent calls' do
@@ -64,11 +66,13 @@ module PhcdevworksAccountsStytch
         expect(first_call).to eq(second_call)
       end
 
-      it 'raises an error if B2C credentials are missing' do
+      it 'raises a custom error if B2C credentials are missing' do
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :project_id).and_return(nil)
         allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :secret).and_return(nil)
 
-        expect { described_class.b2c_client }.to raise_error('Stytch B2C credentials are missing')
+        expect do
+          described_class.b2c_client
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error, /Stytch B2C credentials are missing/)
       end
     end
   end

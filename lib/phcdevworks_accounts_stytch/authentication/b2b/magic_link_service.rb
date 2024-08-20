@@ -8,38 +8,46 @@ module PhcdevworksAccountsStytch
           @client = PhcdevworksAccountsStytch::StytchClient.b2b_client
         end
 
-        def login_or_signup(email, organization_id)
-          @client.magic_links.email.login_or_signup(
+        def process_login_or_signup(email, organization_id)
+          response = @client.magic_links.email.login_or_signup(
             organization_id: organization_id,
             email_address: email
           )
-        rescue Stytch::Error => e
-          handle_error(e)
+          handle_response(response)
         end
 
-        def invite(email, organization_id, session_token)
-          @client.magic_links.email.invite(
+        def process_invite(email, organization_id, session_token)
+          options = PhcdevworksAccountsStytch::Stytch::MethodOptions.new(
+            authorization: { session_token: session_token }
+          )
+
+          response = @client.magic_links.email.invite(
             organization_id: organization_id,
             email_address: email,
-            method_options: {
-              authorization: { session_token: session_token }
-            }
+            method_options: options
           )
-        rescue Stytch::Error => e
-          handle_error(e)
+          handle_response(response)
         end
 
-        def authenticate(token)
-          @client.magic_links.authenticate(magic_links_token: token)
-        rescue Stytch::Error => e
-          handle_error(e)
+        def process_authenticate(token)
+          response = @client.magic_links.authenticate(magic_links_token: token)
+          handle_response(response)
         end
 
         private
 
-        def handle_error(error)
-          Rails.logger.error "Stytch B2B Magic Link error: #{error.message}"
-          nil
+        def handle_response(response)
+          status_code = response[:status_code]
+
+          if status_code && status_code >= 200 && status_code < 300
+            response
+          else
+            raise PhcdevworksAccountsStytch::Stytch::Error.new(
+              status_code: status_code,
+              error_code: response[:error_code],
+              error_message: response[:error_message] || 'An unknown error occurred'
+            )
+          end
         end
       end
     end

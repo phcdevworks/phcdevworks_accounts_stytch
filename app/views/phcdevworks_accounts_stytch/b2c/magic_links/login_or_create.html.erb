@@ -1,0 +1,12 @@
+<h1>Login or Create Account with Magic Link</h1>
+
+<%= form_with url: b2c_magic_links_login_or_create_path, local: true do |form| %>
+  <div class="field">
+    <%= form.label :email, "Your Email" %><br>
+    <%= form.email_field :email, required: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Send Magic Link" %>
+  </div>
+<% end %>

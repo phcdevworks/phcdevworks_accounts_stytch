@@ -16,7 +16,9 @@ module PhcdevworksAccountsStytch
       def create_b2b_client
         project_id = Rails.application.credentials.dig(:stytch, :b2b, :project_id)
         secret = Rails.application.credentials.dig(:stytch, :b2b, :secret)
-        raise 'Stytch B2B credentials are missing' unless project_id && secret
+        unless project_id && secret
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Stytch B2B credentials are missing')
+        end
 
         StytchB2B::Client.new(
           project_id: project_id,
@@ -27,9 +29,11 @@ module PhcdevworksAccountsStytch
       def create_b2c_client
         project_id = Rails.application.credentials.dig(:stytch, :b2c, :project_id)
         secret = Rails.application.credentials.dig(:stytch, :b2c, :secret)
-        raise 'Stytch B2C credentials are missing' unless project_id && secret
+        unless project_id && secret
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Stytch B2C credentials are missing')
+        end
 
-        Stytch::Client.new(
+        ::Stytch::Client.new(
           project_id: project_id,
           secret: secret
         )

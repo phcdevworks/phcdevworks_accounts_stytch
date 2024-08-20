@@ -1,0 +1,17 @@
+<h1>Invite User via Magic Link</h1>
+
+<%= form_with url: b2b_magic_links_process_invite_path, local: true do |form| %>
+  <div class="field">
+    <%= form.label :email, "Invitee's Email" %><br>
+    <%= form.email_field :email, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :organization_id, "Organization ID" %><br>
+    <%= form.text_field :organization_id, required: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Send Invite" %>
+  </div>
+<% end %>
