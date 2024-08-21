@@ -1,5 +1,4 @@
-# frozen_string_literal: true
-
+# spec/lib/phcdevworks_accounts_stytch/authentication/b2b/magic_link_service_spec.rb
 require 'rails_helper'
 
 RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService, type: :service do
@@ -7,7 +6,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   let(:email) { 'user@example.com' }
   let(:organization_id) { 'org_123' }
   let(:session_token) { 'some_session_token' }
-  let(:token) { 'some_valid_token' }
+  let(:magic_links_token) { 'some_valid_token' }
   let(:service) { described_class.new }
 
   before do
@@ -38,7 +37,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
         expect do
           service.process_login_or_signup(email, organization_id)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
-                           'Stytch Error - Code: some_error_code - Message: Login error')
+                           'Stytch Error (Status Code: 400) - Code: some_error_code - Message: Login error')
       end
     end
   end
@@ -73,7 +72,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
         expect do
           service.process_invite(email, organization_id, session_token)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
-                           'Stytch Error - Code: invite_error - Message: Invite error')
+                           'Stytch Error (Status Code: 400) - Code: invite_error - Message: Invite error')
       end
     end
   end
@@ -83,10 +82,10 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
       it 'returns the response' do
         response = { status_code: 200, 'user_id' => 'user_123' }
         allow(client.magic_links).to receive(:authenticate)
-          .with(magic_links_token: token)
+          .with(magic_links_token: magic_links_token)
           .and_return(response)
 
-        expect(service.process_authenticate(token)).to eq(response)
+        expect(service.process_authenticate(magic_links_token)).to eq(response)
       end
     end
 
@@ -94,13 +93,13 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
       it 'raises a custom error' do
         response = { status_code: 400, error_code: 'auth_error', error_message: 'Authentication error' }
         allow(client.magic_links).to receive(:authenticate)
-          .with(magic_links_token: token)
+          .with(magic_links_token: magic_links_token)
           .and_return(response)
 
         expect do
-          service.process_authenticate(token)
+          service.process_authenticate(magic_links_token)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
-                           'Stytch Error - Code: auth_error - Message: Authentication error')
+                           'Stytch Error (Status Code: 400) - Code: auth_error - Message: Authentication error')
       end
     end
   end

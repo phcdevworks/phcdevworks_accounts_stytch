@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module PhcdevworksAccountsStytch
   module Authentication
     module B2b
@@ -29,8 +27,8 @@ module PhcdevworksAccountsStytch
           handle_response(response)
         end
 
-        def process_authenticate(token)
-          response = @client.magic_links.authenticate(magic_links_token: token)
+        def process_authenticate(magic_links_token)
+          response = @client.magic_links.authenticate(magic_links_token: magic_links_token)
           handle_response(response)
         end
 
