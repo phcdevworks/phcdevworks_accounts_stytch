@@ -40,7 +40,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
     context 'when the invite fails' do
       it 'returns an error response' do
         error_message = 'An error occurred with Stytch'
-        allow(service).to receive(:process_invite).and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
+        allow(service).to receive(:process_invite)
+          .and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
 
         post :process_invite, params: { email: email, organization_id: organization_id, session_token: session_token },
                               format: :json
@@ -66,7 +67,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
     context 'when the login or signup fails' do
       it 'returns an error response' do
         error_message = 'An error occurred with Stytch'
-        allow(service).to receive(:process_login_or_signup).and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
+        allow(service).to receive(:process_login_or_signup)
+          .and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
 
         post :process_login_or_signup, params: { email: email, organization_id: organization_id }, format: :json
 
@@ -92,7 +94,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
     context 'when the authentication fails' do
       it 'returns an error response' do
         error_message = 'An error occurred with Stytch'
-        allow(service).to receive(:process_authenticate).and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
+        allow(service).to receive(:process_authenticate)
+          .and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: error_message))
 
         post :process_authenticate, params: { token: token }, format: :json
 

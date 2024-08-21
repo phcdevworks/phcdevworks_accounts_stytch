@@ -1,4 +1,4 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
 RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService, type: :service do
   let(:client) { instance_double(Stytch::Client) }

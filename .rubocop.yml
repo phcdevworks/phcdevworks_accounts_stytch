@@ -53,20 +53,11 @@ Metrics/AbcSize:
 Metrics/ClassLength:
   Max: 150
 
-RSpec:
-  Enabled: true
+RSpec/MultipleExpectations:
+  Max: 10
 
-  MultipleExpectations:
-    Enabled: false
+RSpec/ExampleLength:
+  Max: 10
 
-  MultipleMemoizedHelpers:
-    Max: 10
-
-  ExampleLength:
-    Max: 10
-
-  ContextWording:
-    Enabled: false
-
-  ContextLength:
-    Max: 10
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
