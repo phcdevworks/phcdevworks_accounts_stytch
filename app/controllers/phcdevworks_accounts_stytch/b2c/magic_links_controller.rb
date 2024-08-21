@@ -28,7 +28,7 @@ module PhcdevworksAccountsStytch
 
       def invite
         service = PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
-        result = service.invite(params[:email])
+        result = service.invite(params[:email], params[:session_token])
 
         if result
           render json: { message: 'Invite sent successfully.' }, status: :ok

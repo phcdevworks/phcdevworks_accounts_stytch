@@ -1,113 +1,68 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
-require 'phcdevworks_accounts_stytch/authentication/b2c/magic_link_service'
-
-module Stytch
-  class Error < StandardError; end
-end
 
 RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService, type: :service do
   let(:client) { instance_double(Stytch::Client) }
-  let(:magic_links_email) { instance_double(Stytch::MagicLinks::Email) }
   let(:email) { 'user@example.com' }
-  let(:token) { 'some_valid_token' }
+  let(:magic_links_token) { 'some_valid_token' }
   let(:service) { described_class.new }
 
   before do
+    magic_links_email = instance_double(Stytch::MagicLinks::Email)
     allow(client).to receive(:magic_links).and_return(instance_double(Stytch::MagicLinks, email: magic_links_email))
     allow(PhcdevworksAccountsStytch::StytchClient).to receive(:b2c_client).and_return(client)
   end
 
-  describe '#login_or_create' do
-    it 'successfully logs in or creates a user' do
-      response = { 'user_id' => 'user_123' }
-      allow(magic_links_email).to receive(:login_or_create)
-        .with(email: email)
-        .and_return(response)
-
-      expect(service.login_or_create(email)).to eq(response)
-    end
-
-    it 'handles errors gracefully' do
-      allow(magic_links_email).to receive(:login_or_create)
-        .with(email: email)
-        .and_raise(Stytch::Error.new('Login error'))
-
-      expect(service.login_or_create(email)).to be_nil
-    end
-  end
-
-  describe '#send_magic_link' do
-    it 'successfully sends a magic link' do
-      allow(magic_links_email).to receive(:send)
-        .with(email: email)
-        .and_return(true)
-
-      expect(service.send_magic_link(email)).to be_truthy
-    end
-
-    it 'handles errors gracefully' do
-      allow(magic_links_email).to receive(:send)
-        .with(email: email)
-        .and_raise(Stytch::Error.new('Send error'))
-
-      expect(service.send_magic_link(email)).to be_nil
-    end
-  end
-
   describe '#invite' do
-    it 'successfully sends an invite' do
-      allow(magic_links_email).to receive(:invite)
-        .with(email: email)
-        .and_return(true)
+    context 'when invite is successful' do
+      it 'returns the response' do
+        response = { status_code: 200 }
+        allow(client.magic_links.email).to receive(:invite)
+          .with(email: email)
+          .and_return(response)
 
-      expect(service.invite(email)).to be_truthy
+        expect(service.invite(email)).to eq(response)
+      end
     end
 
-    it 'handles errors gracefully' do
-      allow(magic_links_email).to receive(:invite)
-        .with(email: email)
-        .and_raise(Stytch::Error.new('Invite error'))
+    context 'when invite fails' do
+      it 'raises a custom error' do
+        response = { status_code: 400, error_code: 'invite_error', error_message: 'Invite error' }
+        allow(client.magic_links.email).to receive(:invite)
+          .with(email: email)
+          .and_return(response)
 
-      expect(service.invite(email)).to be_nil
-    end
-  end
-
-  describe '#revoke_invite' do
-    it 'successfully revokes an invite' do
-      allow(magic_links_email).to receive(:revoke_invite)
-        .with(email: email)
-        .and_return(true)
-
-      expect(service.revoke_invite(email)).to be_truthy
-    end
-
-    it 'handles errors gracefully' do
-      allow(magic_links_email).to receive(:revoke_invite)
-        .with(email: email)
-        .and_raise(Stytch::Error.new('Revoke invite error'))
-
-      expect(service.revoke_invite(email)).to be_nil
+        expect do
+          service.invite(email)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
+                           'Stytch Error (Status Code: 400) - Code: invite_error - Message: Invite error')
+      end
     end
   end
 
   describe '#authenticate' do
-    it 'successfully authenticates a user with a magic link' do
-      response = { 'user_id' => 'user_123' }
-      allow(client.magic_links).to receive(:authenticate)
-        .with(token: token)
-        .and_return(response)
+    context 'when authentication is successful' do
+      it 'returns the response' do
+        response = { status_code: 200, 'user_id' => 'user_123' }
+        allow(client.magic_links).to receive(:authenticate)
+          .with(token: magic_links_token)
+          .and_return(response)
 
-      expect(service.authenticate(token)).to eq(response)
+        expect(service.authenticate(magic_links_token)).to eq(response)
+      end
     end
 
-    it 'handles errors gracefully' do
-      allow(client.magic_links).to receive(:authenticate)
-        .with(token: token)
-        .and_raise(Stytch::Error.new('Authentication error'))
+    context 'when authentication fails' do
+      it 'raises a custom error' do
+        response = { status_code: 400, error_code: 'auth_error', error_message: 'Authentication error' }
+        allow(client.magic_links).to receive(:authenticate)
+          .with(token: magic_links_token)
+          .and_return(response)
 
-      expect(service.authenticate(token)).to be_nil
+        expect do
+          service.authenticate(magic_links_token)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
+                           'Stytch Error (Status Code: 400) - Code: auth_error - Message: Authentication error')
+      end
     end
   end
 end

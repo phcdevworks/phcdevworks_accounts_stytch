@@ -1,4 +1,3 @@
-# spec/lib/phcdevworks_accounts_stytch/authentication/b2b/magic_link_service_spec.rb
 require 'rails_helper'
 
 RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService, type: :service do
