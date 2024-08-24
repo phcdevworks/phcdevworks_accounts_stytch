@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
-# Specify your gem's dependencies in ruby_api_pack_cloudways.gemspec
+# Specify your gem's dependencies in phcdevworks_accounts_stytch.gemspec.
 gemspec
+
+gem 'puma'
 
 group :development, :test do
   gem 'bundler', '~> 2.5'
@@ -17,6 +18,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 6.1'
   gem 'rubocop', '~> 1.64', require: false
   gem 'rubocop-performance', '~> 1.21', require: false
+  gem 'rubocop-rails-omakase', require: false
   gem 'rubocop-rake', '~> 0.6.0', require: false
   gem 'rubocop-rspec', '~> 3.0', require: false
   gem 'sqlite3', '~> 1.4'
