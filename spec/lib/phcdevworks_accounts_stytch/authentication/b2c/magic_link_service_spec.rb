@@ -9,7 +9,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService,
   before do
     magic_links_email = instance_double(Stytch::MagicLinks::Email)
     allow(client).to receive(:magic_links).and_return(instance_double(Stytch::MagicLinks, email: magic_links_email))
-    allow(PhcdevworksAccountsStytch::StytchClient).to receive(:b2c_client).and_return(client)
+    allow(PhcdevworksAccountsStytch::Stytch::Client).to receive(:b2c_client).and_return(client)
   end
 
   describe '#invite' do

@@ -11,7 +11,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   before do
     magic_links_email = instance_double(StytchB2B::MagicLinks::Email)
     allow(client).to receive(:magic_links).and_return(instance_double(StytchB2B::MagicLinks, email: magic_links_email))
-    allow(PhcdevworksAccountsStytch::StytchClient).to receive(:b2b_client).and_return(client)
+    allow(PhcdevworksAccountsStytch::Stytch::Client).to receive(:b2b_client).and_return(client)
   end
 
   describe '#process_login_or_signup' do

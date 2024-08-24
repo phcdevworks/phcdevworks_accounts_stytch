@@ -5,7 +5,7 @@ module PhcdevworksAccountsStytch
     module B2b
       class MagicLinkService
         def initialize
-          @client = PhcdevworksAccountsStytch::StytchClient.b2b_client
+          @client = PhcdevworksAccountsStytch::Stytch::Client.b2b_client
         end
 
         def process_login_or_signup(email, organization_id)

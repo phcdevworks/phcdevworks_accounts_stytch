@@ -2,7 +2,7 @@
 
 require 'stytch'
 require 'phcdevworks_accounts_stytch/engine'
-require 'phcdevworks_accounts_stytch/stytch_client'
+require 'phcdevworks_accounts_stytch/stytch/client'
 
 module PhcdevworksAccountsStytch
   # Your code goes here...
