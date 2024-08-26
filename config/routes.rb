@@ -9,8 +9,8 @@ PhcdevworksAccountsStytch::Engine.routes.draw do
     get 'magic_links/signup', to: 'magic_links#login_or_signup'
 
     # POST routes for processing form submissions or API requests
-    post 'magic_links/process_invite', to: 'magic_links#process_invite'
     post 'magic_links/process_authenticate', to: 'magic_links#process_authenticate'
+    post 'magic_links/process_invite', to: 'magic_links#process_invite'
     post 'magic_links/process_login_or_signup', to: 'magic_links#process_login_or_signup'
   end
 

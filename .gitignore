@@ -8,6 +8,7 @@
 /tmp/
 *.gem
 spec/dummy/log/*
+spec/dummy/tmp/*
 .rspec_status
 /spec/vcr_cassettes/
 .env

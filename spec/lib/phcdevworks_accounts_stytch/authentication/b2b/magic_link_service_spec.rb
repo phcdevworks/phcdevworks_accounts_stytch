@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService, type: :service do
+require 'rails_helper'
+
+RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService do
   let(:client) { instance_double(StytchB2B::Client) }
+  let(:magic_links) { instance_double(StytchB2B::MagicLinks) }
+  let(:magic_links_email) { instance_double(StytchB2B::MagicLinks::Email) }
   let(:email) { 'user@example.com' }
   let(:organization_id) { 'org_123' }
   let(:session_token) { 'some_session_token' }
@@ -9,18 +13,22 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   let(:service) { described_class.new }
 
   before do
-    magic_links_email = instance_double(StytchB2B::MagicLinks::Email)
-    allow(client).to receive(:magic_links).and_return(instance_double(StytchB2B::MagicLinks, email: magic_links_email))
+    allow(client).to receive(:magic_links).and_return(magic_links)
+    allow(magic_links).to receive(:email).and_return(magic_links_email)
     allow(PhcdevworksAccountsStytch::Stytch::Client).to receive(:b2b_client).and_return(client)
   end
 
   describe '#process_login_or_signup' do
     context 'when login or signup is successful' do
-      it 'returns the response' do
-        response = { status_code: 200, 'user_id' => 'user_123' }
+      it 'returns a Success object' do
+        response = successful_response
         allow_successful_login_or_signup(response)
 
-        expect(service.process_login_or_signup(email, organization_id)).to eq(response)
+        result = service.process_login_or_signup(email, organization_id)
+
+        expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
+        expect(result.status_code).to eq(200)
+        expect(result.data).to eq(response)
       end
     end
 
@@ -38,11 +46,15 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
 
   describe '#process_invite' do
     context 'when invite is successful' do
-      it 'returns the response' do
-        response = { status_code: 200 }
+      it 'returns a Success object' do
+        response = successful_response
         allow_successful_invite(response)
 
-        expect(service.process_invite(email, organization_id, session_token)).to eq(response)
+        result = service.process_invite(email, organization_id, session_token)
+
+        expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
+        expect(result.status_code).to eq(200)
+        expect(result.data).to eq(response)
       end
     end
 
@@ -60,11 +72,15 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
 
   describe '#process_authenticate' do
     context 'when authentication is successful' do
-      it 'returns the response' do
-        response = { status_code: 200, 'user_id' => 'user_123' }
+      it 'returns a Success object' do
+        response = successful_response
         allow_successful_authentication(response)
 
-        expect(service.process_authenticate(magic_links_token)).to eq(response)
+        result = service.process_authenticate(magic_links_token)
+
+        expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
+        expect(result.status_code).to eq(200)
+        expect(result.data).to eq(response)
       end
     end
 
@@ -82,21 +98,34 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
 
   private
 
+  def successful_response
+    {
+      http_status_code: 200,
+      user_id: 'user_123'
+    }
+  end
+
   def allow_successful_login_or_signup(response)
-    allow(client.magic_links.email).to receive(:login_or_signup)
+    allow(magic_links_email).to receive(:login_or_signup)
       .with(organization_id: organization_id, email_address: email)
       .and_return(response)
   end
 
   def allow_failed_login_or_signup
-    response = { status_code: 400, error_code: 'some_error_code', error_message: 'Login error' }
-    allow(client.magic_links.email).to receive(:login_or_signup)
+    response = {
+      http_status_code: 400,
+      stytch_api_error: {
+        error_type: 'some_error_code',
+        error_message: 'Login error'
+      }
+    }
+    allow(magic_links_email).to receive(:login_or_signup)
       .with(organization_id: organization_id, email_address: email)
       .and_return(response)
   end
 
   def allow_successful_invite(response)
-    allow(client.magic_links.email).to receive(:invite)
+    allow(magic_links_email).to receive(:invite)
       .with(
         organization_id: organization_id,
         email_address: email,
@@ -106,8 +135,14 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   end
 
   def allow_failed_invite
-    response = { status_code: 400, error_code: 'invite_error', error_message: 'Invite error' }
-    allow(client.magic_links.email).to receive(:invite)
+    response = {
+      http_status_code: 400,
+      stytch_api_error: {
+        error_type: 'invite_error',
+        error_message: 'Invite error'
+      }
+    }
+    allow(magic_links_email).to receive(:invite)
       .with(
         organization_id: organization_id,
         email_address: email,
@@ -117,14 +152,20 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService,
   end
 
   def allow_successful_authentication(response)
-    allow(client.magic_links).to receive(:authenticate)
+    allow(magic_links).to receive(:authenticate)
       .with(magic_links_token: magic_links_token)
       .and_return(response)
   end
 
   def allow_failed_authentication
-    response = { status_code: 400, error_code: 'auth_error', error_message: 'Authentication error' }
-    allow(client.magic_links).to receive(:authenticate)
+    response = {
+      http_status_code: 400,
+      stytch_api_error: {
+        error_type: 'auth_error',
+        error_message: 'Authentication error'
+      }
+    }
+    allow(magic_links).to receive(:authenticate)
       .with(magic_links_token: magic_links_token)
       .and_return(response)
   end
