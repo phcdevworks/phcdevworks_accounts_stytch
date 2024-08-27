@@ -85,7 +85,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
+        expect(JSON.parse(response.body))
+          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
       end
     end
   end
