@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-
-# Specify your gem's dependencies in phcdevworks_accounts_stytch.gemspec.
 gemspec
 
 gem 'puma'
+gem 'sprockets-rails'
 
 group :development, :test do
   gem 'bundler', '~> 2.5'
   gem 'dotenv-rails', '~> 3.1'
   gem 'factory_bot', '~> 6.4', '>= 6.4.6'
-  gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3'
+  gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3', require: false
   gem 'faker', '~> 3.4', '>= 3.4.2'
   gem 'rake', '~> 13.2'
   gem 'rspec', '~> 3.13'
