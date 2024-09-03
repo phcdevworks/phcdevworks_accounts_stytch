@@ -10,7 +10,7 @@ module PhcdevworksAccountsStytch
 
         def process_login_or_signup(email)
           log_action('Login or Signup', email: email)
-          response = @client.magic_links.email.login_or_create(email: email)
+          response = @client.magic_links.email.login_or_signup(email: email)
           handle_response(response)
         end
 

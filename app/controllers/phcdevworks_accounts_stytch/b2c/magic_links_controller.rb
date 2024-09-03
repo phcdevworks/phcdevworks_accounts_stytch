@@ -26,7 +26,7 @@ module PhcdevworksAccountsStytch
       end
 
       def process_invite
-        if params[:email].blank?
+        if missing_required_params?
           handle_missing_params_error
           return
         end
@@ -86,6 +86,10 @@ module PhcdevworksAccountsStytch
       def handle_missing_params_error
         log_error('Missing email')
         render json: { error: 'Email is required.' }, status: :unprocessable_entity
+      end
+
+      def missing_required_params?
+        params[:email].blank?
       end
 
       def service
