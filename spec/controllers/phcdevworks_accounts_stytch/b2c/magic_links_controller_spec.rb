@@ -8,16 +8,17 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
   let(:email) { 'user@example.com' }
   let(:token) { 'some_valid_token' }
   let(:service) { instance_double(PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService) }
+  let(:stytch_error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_code: 'error_code', error_message: 'An error occurred') }
 
   before do
     allow(PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService).to receive(:new).and_return(service)
   end
 
-  describe 'POST #login_or_create' do
-    context 'when login or create is successful' do
+  describe 'POST #process_login_or_signup' do
+    context 'when login or signup is successful' do
       before do
-        allow(service).to receive(:login_or_create).and_return({ 'user_id' => 'user_123' })
-        post :login_or_create, params: { email: email }, format: :json
+        allow(service).to receive(:process_login_or_signup).and_return(instance_double('Result', message: 'Success', data: { 'user_id' => 'user_123' }))
+        post :process_login_or_signup, params: { email: email }, format: :json
       end
 
       it 'returns a success status' do
@@ -25,55 +26,27 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
       end
 
       it 'returns the correct user_id' do
-        expect(JSON.parse(response.body)['user_id']).to eq('user_123')
+        expect(JSON.parse(response.body)['data']['user_id']).to eq('user_123')
       end
     end
 
-    context 'when login or create fails' do
+    context 'when login or signup fails' do
       before do
-        allow(service).to receive(:login_or_create).and_return(nil)
-        post :login_or_create, params: { email: email }, format: :json
+        allow(service).to receive(:process_login_or_signup).and_raise(stytch_error)
+        post :process_login_or_signup, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns a bad request status' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end
 
-  describe 'POST #send_magic_link' do
-    context 'when sending magic link is successful' do
-      before do
-        allow(service).to receive(:send_magic_link).and_return(true)
-        post :send_magic_link, params: { email: email }, format: :json
-      end
-
-      it 'returns a success status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns the correct message' do
-        expect(JSON.parse(response.body)['message']).to eq('Magic link sent successfully.')
-      end
-    end
-
-    context 'when sending magic link fails' do
-      before do
-        allow(service).to receive(:send_magic_link).and_return(nil)
-        post :send_magic_link, params: { email: email }, format: :json
-      end
-
-      it 'returns an unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
-      end
-    end
-  end
-
-  describe 'POST #invite' do
+  describe 'POST #process_invite' do
     context 'when invite is successful' do
       before do
-        allow(service).to receive(:invite).and_return(true)
-        post :invite, params: { email: email }, format: :json
+        allow(service).to receive(:process_invite).and_return(instance_double('Result', message: 'Invite sent successfully.', data: {}))
+        post :process_invite, params: { email: email }, format: :json
       end
 
       it 'returns a success status' do
@@ -87,21 +60,21 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when invite fails' do
       before do
-        allow(service).to receive(:invite).and_return(nil)
-        post :invite, params: { email: email }, format: :json
+        allow(service).to receive(:process_invite).and_raise(stytch_error)
+        post :process_invite, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns a bad request status' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end
 
-  describe 'POST #revoke_invite' do
+  describe 'POST #process_revoke_invite' do
     context 'when revoke invite is successful' do
       before do
-        allow(service).to receive(:revoke_invite).and_return(true)
-        post :revoke_invite, params: { email: email }, format: :json
+        allow(service).to receive(:process_revoke_invite).and_return(instance_double('Result', message: 'Invite revoked successfully.', data: {}))
+        post :process_revoke_invite, params: { email: email }, format: :json
       end
 
       it 'returns a success status' do
@@ -115,21 +88,21 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when revoke invite fails' do
       before do
-        allow(service).to receive(:revoke_invite).and_return(nil)
-        post :revoke_invite, params: { email: email }, format: :json
+        allow(service).to receive(:process_revoke_invite).and_raise(stytch_error)
+        post :process_revoke_invite, params: { email: email }, format: :json
       end
 
-      it 'returns an unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns a bad request status' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end
 
-  describe 'POST #authenticate' do
+  describe 'POST #process_authenticate' do
     context 'when authentication is successful' do
       before do
-        allow(service).to receive(:authenticate).and_return({ 'user_id' => 'user_123' })
-        post :authenticate, params: { token: token }, format: :json
+        allow(service).to receive(:process_authenticate).and_return(instance_double('Result', message: 'Authentication successful.', data: { 'user_id' => 'user_123' }))
+        post :process_authenticate, params: { token: token }, format: :json
       end
 
       it 'returns a success status' do
@@ -137,18 +110,18 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
       end
 
       it 'returns the correct user_id' do
-        expect(JSON.parse(response.body)['user_id']).to eq('user_123')
+        expect(JSON.parse(response.body)['data']['user_id']).to eq('user_123')
       end
     end
 
     context 'when authentication fails' do
       before do
-        allow(service).to receive(:authenticate).and_return(nil)
-        post :authenticate, params: { token: token }, format: :json
+        allow(service).to receive(:process_authenticate).and_raise(stytch_error)
+        post :process_authenticate, params: { token: token }, format: :json
       end
 
-      it 'returns an unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns a bad request status' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end

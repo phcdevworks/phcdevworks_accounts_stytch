@@ -8,11 +8,6 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2c::MagicLinksController', type: :ro
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#invite')
     end
 
-    it 'routes GET /b2c/magic_links/revoke_invite to b2c/magic_links#invite' do
-      expect(get: '/b2c/magic_links/revoke_invite')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#invite')
-    end
-
     it 'routes GET /b2c/magic_links/authenticate to b2c/magic_links#authenticate' do
       expect(get: '/b2c/magic_links/authenticate')
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#authenticate')
@@ -29,29 +24,24 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2c::MagicLinksController', type: :ro
     end
 
     # POST routes
-    it 'routes POST /b2c/magic_links/invite to b2c/magic_links#invite' do
-      expect(post: '/b2c/magic_links/invite')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#invite')
+    it 'routes POST /b2c/magic_links/process_authenticate to b2c/magic_links#process_authenticate' do
+      expect(post: '/b2c/magic_links/process_authenticate')
+        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_authenticate')
     end
 
-    it 'routes POST /b2c/magic_links/authenticate to b2c/magic_links#authenticate' do
-      expect(post: '/b2c/magic_links/authenticate')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#authenticate')
+    it 'routes POST /b2c/magic_links/process_invite to b2c/magic_links#process_invite' do
+      expect(post: '/b2c/magic_links/process_invite')
+        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_invite')
     end
 
-    it 'routes POST /b2c/magic_links/login_or_create to b2c/magic_links#login_or_create' do
-      expect(post: '/b2c/magic_links/login_or_create')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#login_or_create')
+    it 'routes POST /b2c/magic_links/process_revoke_invite to b2c/magic_links#process_revoke_invite' do
+      expect(post: '/b2c/magic_links/process_revoke_invite')
+        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_revoke_invite')
     end
 
-    it 'routes POST /b2c/magic_links/revoke_invite to b2c/magic_links#revoke_invite' do
-      expect(post: '/b2c/magic_links/revoke_invite')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#revoke_invite')
-    end
-
-    it 'routes POST /b2c/magic_links/send to b2c/magic_links#send_magic_link' do
-      expect(post: '/b2c/magic_links/send')
-        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#send_magic_link')
+    it 'routes POST /b2c/magic_links/process_login_or_signup to b2c/magic_links#process_login_or_signup' do
+      expect(post: '/b2c/magic_links/process_login_or_signup')
+        .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_login_or_signup')
     end
   end
 end

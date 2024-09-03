@@ -8,27 +8,26 @@ module PhcdevworksAccountsStytch
           @client = PhcdevworksAccountsStytch::Stytch::Client.b2c_client
         end
 
-        def login_or_create(email)
+        def process_login_or_signup(email)
+          log_action('Login or Signup', email: email)
           response = @client.magic_links.email.login_or_create(email: email)
           handle_response(response)
         end
 
-        def send_magic_link(email)
-          response = @client.magic_links.email.send(email: email)
-          handle_response(response)
-        end
-
-        def invite(email, _session_token = nil)
+        def process_invite(email)
+          log_action('Invite', email: email)
           response = @client.magic_links.email.invite(email: email)
           handle_response(response)
         end
 
-        def revoke_invite(email)
+        def process_revoke_invite(email)
+          log_action('Revoke Invite', email: email)
           response = @client.magic_links.email.revoke_invite(email: email)
           handle_response(response)
         end
 
-        def authenticate(token)
+        def process_authenticate(token)
+          log_action('Authenticate', magic_links_token: token)
           response = @client.magic_links.authenticate(token: token)
           handle_response(response)
         end
@@ -36,17 +35,19 @@ module PhcdevworksAccountsStytch
         private
 
         def handle_response(response)
-          status_code = response[:status_code]
+          PhcdevworksAccountsStytch::Stytch::Response.handle_response(response)
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          log_error(e)
+          raise
+        end
 
-          if status_code && status_code >= 200 && status_code < 300
-            response
-          else
-            raise PhcdevworksAccountsStytch::Stytch::Error.new(
-              status_code: status_code,
-              error_code: response[:error_code],
-              error_message: response[:error_message] || 'An unknown error occurred'
-            )
-          end
+        def log_action(action_name, details = {})
+          Rails.logger.info "Starting #{action_name} with details: #{details.inspect}"
+        end
+
+        def log_error(error)
+          Rails.logger.error "Error occurred: #{error.message}"
+          Rails.logger.error error.backtrace.join("\n")
         end
       end
     end
