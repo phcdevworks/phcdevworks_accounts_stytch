@@ -10,7 +10,7 @@ module PhcdevworksAccountsStytch
 
         def process_login_or_signup(email)
           log_action('Login or Signup', email: email)
-          response = @client.magic_links.email.login_or_signup(email: email)
+          response = @client.magic_links.email.login_or_create(email: email)
           handle_response(response)
         end
 
@@ -27,7 +27,7 @@ module PhcdevworksAccountsStytch
         end
 
         def process_authenticate(token)
-          log_action('Authenticate', magic_links_token: token)
+          log_action('Authenticate', token: token)
           response = @client.magic_links.authenticate(token: token)
           handle_response(response)
         end

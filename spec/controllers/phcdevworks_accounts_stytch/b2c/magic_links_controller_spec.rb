@@ -104,7 +104,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Revoke invite error')
+        expect(JSON.parse(response.body))
+          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Revoke invite error')
       end
     end
   end
@@ -112,7 +113,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
   describe 'POST #process_authenticate' do
     context 'when authentication is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.', data: { 'user_id' => 'user_123' })
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.',
+                                                                    data: { 'user_id' => 'user_123' })
       end
 
       before do
@@ -122,7 +124,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Authentication successful.', 'data' => { 'user_id' => 'user_123' })
+        expect(JSON.parse(response.body)).to include('message' => 'Authentication successful.',
+                                                     'data' => { 'user_id' => 'user_123' })
       end
     end
 
@@ -136,7 +139,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Authentication error')
+        expect(JSON.parse(response.body))
+          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Authentication error')
       end
     end
   end

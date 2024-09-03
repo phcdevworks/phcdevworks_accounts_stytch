@@ -49,7 +49,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
         response = successful_response
         allow_successful_invite(response)
 
-        result = service.process_invite(email, session_token)
+        result = service.process_invite(email)
 
         expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
         expect(result.status_code).to eq(200)
@@ -62,7 +62,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
         allow_failed_invite
 
         expect do
-          service.process_invite(email, session_token)
+          service.process_invite(email)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
                            'Stytch Error (Status Code: 400) - Code: invite_error - Message: Invite error')
       end
@@ -105,8 +105,8 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
   end
 
   def allow_successful_login_or_signup(response)
-    allow(magic_links_email).to receive(:login_or_signup)
-      .with(email_address: email)
+    allow(magic_links_email).to receive(:login_or_create)
+      .with(email: email)
       .and_return(response)
   end
 
@@ -118,17 +118,14 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
         error_message: 'Login error'
       }
     }
-    allow(magic_links_email).to receive(:login_or_signup)
-      .with(email_address: email)
+    allow(magic_links_email).to receive(:login_or_create)
+      .with(email: email)
       .and_return(response)
   end
 
   def allow_successful_invite(response)
     allow(magic_links_email).to receive(:invite)
-      .with(
-        email_address: email,
-        method_options: instance_of(PhcdevworksAccountsStytch::Stytch::MethodOptions)
-      )
+      .with(email: email)
       .and_return(response)
   end
 
@@ -141,16 +138,13 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
       }
     }
     allow(magic_links_email).to receive(:invite)
-      .with(
-        email_address: email,
-        method_options: instance_of(PhcdevworksAccountsStytch::Stytch::MethodOptions)
-      )
+      .with(email: email)
       .and_return(response)
   end
 
   def allow_successful_authentication(response)
     allow(magic_links).to receive(:authenticate)
-      .with(magic_links_token: magic_links_token)
+      .with(token: magic_links_token)
       .and_return(response)
   end
 
@@ -163,7 +157,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
       }
     }
     allow(magic_links).to receive(:authenticate)
-      .with(magic_links_token: magic_links_token)
+      .with(token: magic_links_token)
       .and_return(response)
   end
 end
