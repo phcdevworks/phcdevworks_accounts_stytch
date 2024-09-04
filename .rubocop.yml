@@ -40,7 +40,7 @@ Layout/EndOfLine:
   AutoCorrect: true
 
 Layout/LineLength:
-  Max: 125
+  Max: 130
   AllowHeredoc: true
   AllowURI: true
 
