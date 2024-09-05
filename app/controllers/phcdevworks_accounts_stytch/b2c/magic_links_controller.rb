@@ -3,14 +3,17 @@
 module PhcdevworksAccountsStytch
   module B2c
     class MagicLinksController < ApplicationController
-      # PHCDEVONE - Page Views
-      def invite; end
-
-      def authenticate; end
+      def authenticate
+        if params[:token].blank?
+          log_error('Missing magic link token')
+          render json: { error: 'Magic link token is required.' }, status: :unprocessable_entity
+        else
+          redirect_to b2c_magic_links_process_authenticate_path(token: params[:token])
+        end
+      end
 
       def login_or_signup; end
 
-      # PHCDEVONE - Processing Actions
       def process_login_or_signup
         if params[:email].blank?
           log_error('Missing email')
@@ -24,6 +27,8 @@ module PhcdevworksAccountsStytch
           result
         end
       end
+
+      def invite; end
 
       def process_invite
         if missing_required_params?
