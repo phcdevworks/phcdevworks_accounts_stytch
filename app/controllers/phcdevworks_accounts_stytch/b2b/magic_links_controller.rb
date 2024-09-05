@@ -46,7 +46,6 @@ module PhcdevworksAccountsStytch
         handle_service_action(:authenticate) do
           result = service.process_authenticate(params[:token])
           Rails.logger.info("Authentication successful: #{result.data}")
-          result
         end
       end
 
@@ -62,7 +61,12 @@ module PhcdevworksAccountsStytch
 
       def handle_service_action(action_name)
         result = yield
-        render json: { message: result.message, data: result.data }, status: :ok
+
+        if result.is_a?(Hash) && result.key?(:message)
+          render json: { message: result[:message], data: result[:data] }, status: :ok
+        else
+          render json: { message: 'Action completed successfully', data: result }, status: :ok
+        end
       rescue PhcdevworksAccountsStytch::Stytch::Error => e
         log_error("Stytch API error during #{action_name}: #{e.message}")
         render json: { error: e.message }, status: :bad_request
