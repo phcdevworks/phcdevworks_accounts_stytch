@@ -69,7 +69,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::PasswordsController, type: :contr
 
     context 'when the Stytch service raises an error' do
       it 'returns a bad request when a Stytch::Error is raised' do
-        allow(service).to receive(:authenticate_password).and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Invalid credentials'))
+        allow(service).to receive(:authenticate_password)
+          .and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Invalid credentials'))
 
         post :process_authenticate, params: { email: email, password: password }
 

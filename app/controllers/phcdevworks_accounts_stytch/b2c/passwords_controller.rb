@@ -21,9 +21,12 @@ module PhcdevworksAccountsStytch
 
         handle_service_action(:authenticate) do
           result = service.authenticate_password(params[:email], params[:password])
-          Rails.logger.info("B2C Password authentication successful: #{result.data}")
+          Rails.logger.info("B2C Authentication successful: #{result.inspect}")
           result
         end
+      rescue StandardError => e
+        Rails.logger.error("Unexpected error in process_authenticate: #{e.message}")
+        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
 
       private

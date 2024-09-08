@@ -1,59 +1,115 @@
 # frozen_string_literal: true
 
-module PhcdevworksAccountsStytch
-  module B2b
-    class PasswordsController < ApplicationController
-      def authenticate
-        if missing_required_params?
-          log_error('Missing email, password, or organization ID')
-          render json: { error: 'Email, password, and organization ID are required.' }, status: :unprocessable_entity
-        else
-          redirect_to b2b_passwords_process_authenticate_path(email: params[:email], password: params[:password],
-                                                              organization_id: params[:organization_id])
-        end
+require 'rails_helper'
+
+RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :controller do
+  let(:email) { 'user@example.com' }
+  let(:password) { 'securepassword' }
+  let(:organization_id) { 'organization-test-123' }
+  let(:service) { instance_double(PhcdevworksAccountsStytch::Authentication::B2b::PasswordService) }
+
+  before do
+    allow(PhcdevworksAccountsStytch::Authentication::B2b::PasswordService).to receive(:new).and_return(service)
+    @routes = PhcdevworksAccountsStytch::Engine.routes
+  end
+
+  describe 'POST #authenticate' do
+    context 'when email, password, and organization_id are provided' do
+      it 'redirects to the process_authenticate path' do
+        post :authenticate, params: { email: email, password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(
+          b2b_passwords_process_authenticate_path(
+            email: email,
+            password: password,
+            organization_id: organization_id
+          )
+        )
+      end
+    end
+
+    context 'when any required parameter is missing' do
+      it 'returns an error when email is missing' do
+        post :authenticate, params: { email: '', password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
       end
 
-      def process_authenticate
-        if missing_required_params?
-          log_error('Missing email, password, or organization ID')
-          render json: { error: 'Email, password, and organization ID are required.' }, status: :unprocessable_entity
-          return
-        end
+      it 'returns an error when password is missing' do
+        post :authenticate, params: { email: email, password: '', organization_id: organization_id }
 
-        handle_service_action(:authenticate) do
-          result = service.authenticate_password(params[:email], params[:password], params[:organization_id])
-          Rails.logger.info("B2B Password authentication successful: #{result.data}")
-          result
-        end
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
       end
 
-      private
+      it 'returns an error when organization_id is missing' do
+        post :authenticate, params: { email: email, password: password, organization_id: '' }
 
-      def missing_required_params?
-        params[:email].blank? || params[:password].blank? || params[:organization_id].blank?
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
+      end
+    end
+  end
+
+  describe 'POST #process_authenticate' do
+    context 'when successful' do
+      it 'authenticates the user and returns success' do
+        allow(service).to receive(:authenticate_password)
+          .with(email, password, organization_id)
+          .and_return({ message: 'Success', data: {} })
+
+        post :process_authenticate, params: { email: email, password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['message']).to eq('Success')
+      end
+    end
+
+    context 'when any required parameter is missing' do
+      it 'returns an error when email is missing' do
+        post :process_authenticate, params: { email: '', password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
       end
 
-      def service
-        PhcdevworksAccountsStytch::Authentication::B2b::PasswordService.new
+      it 'returns an error when password is missing' do
+        post :process_authenticate, params: { email: email, password: '', organization_id: organization_id }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
       end
 
-      def log_error(message)
-        Rails.logger.error(message)
-      end
+      it 'returns an error when organization_id is missing' do
+        post :process_authenticate, params: { email: email, password: password, organization_id: '' }
 
-      def handle_service_action(action_name)
-        result = yield
-        if result.is_a?(Hash) && result.key?(:message)
-          render json: { message: result[:message], data: result[:data] }, status: :ok
-        else
-          render json: { message: 'Action completed successfully', data: result }, status: :ok
-        end
-      rescue PhcdevworksAccountsStytch::Stytch::Error => e
-        log_error("Stytch API error during #{action_name}: #{e.message}")
-        render json: { error: e.message }, status: :bad_request
-      rescue StandardError => e
-        log_error("Unexpected error during #{action_name}: #{e.message}")
-        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email, password, and organization ID are required.')
+      end
+    end
+
+    context 'when the Stytch service raises an error' do
+      it 'returns a bad request when a Stytch::Error is raised' do
+        allow(service).to receive(:authenticate_password)
+          .and_raise(PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Invalid credentials'))
+
+        post :process_authenticate, params: { email: email, password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(JSON.parse(response.body)['error']).to eq('Stytch Error - Message: Invalid credentials')
+      end
+    end
+
+    context 'when an unexpected error occurs' do
+      it 'returns an internal server error' do
+        allow(service).to receive(:authenticate_password).and_raise(StandardError.new('Unexpected error'))
+
+        post :process_authenticate, params: { email: email, password: password, organization_id: organization_id }
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(JSON.parse(response.body)['error']).to eq('An unexpected error occurred.')
       end
     end
   end
