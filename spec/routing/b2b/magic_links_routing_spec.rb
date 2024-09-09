@@ -13,14 +13,6 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2b::MagicLinksController', type: :ro
       )
   end
 
-  it 'routes GET /b2b/magic_links/authenticate to b2b/magic_links#authenticate' do
-    expect(get: '/b2b/magic_links/authenticate')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/magic_links',
-        action: 'authenticate'
-      )
-  end
-
   it 'routes GET /b2b/magic_links/login/:organization_slug to b2b/magic_links#login_or_signup' do
     expect(get: "/b2b/magic_links/login/#{organization_slug}")
       .to route_to(
@@ -49,20 +41,21 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2b::MagicLinksController', type: :ro
       )
   end
 
-  it 'routes POST /b2b/magic_links/process_authenticate to b2b/magic_links#process_authenticate' do
-    expect(post: '/b2b/magic_links/process_authenticate')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/magic_links',
-        action: 'process_authenticate'
-      )
-  end
-
   it 'routes POST /b2b/magic_links/process_login_or_signup/:organization_slug to b2b/magic_links#process_login_or_signup' do
     expect(post: "/b2b/magic_links/process_login_or_signup/#{organization_slug}")
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/magic_links',
         action: 'process_login_or_signup',
         organization_slug: organization_slug
+      )
+  end
+
+  # Consolidated AuthenticateController routes
+  it 'routes POST /b2b/authenticate to b2b/authenticate#authenticate' do
+    expect(post: '/b2b/authenticate')
+      .to route_to(
+        controller: 'phcdevworks_accounts_stytch/b2b/authenticate',
+        action: 'authenticate'
       )
   end
 end

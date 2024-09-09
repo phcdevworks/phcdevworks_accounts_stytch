@@ -10,7 +10,6 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
   let(:organization_slug) { 'example-org' }
   let(:organization_id) { 'org_123' }
   let(:session_token) { 'some_session_token' }
-  let(:magic_links_token) { 'some_valid_token' }
   let(:organization_service) { instance_double(PhcdevworksAccountsStytch::Stytch::Organization) }
 
   before do
@@ -93,39 +92,6 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body))
           .to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
-      end
-    end
-  end
-
-  describe 'POST #process_authenticate' do
-    context 'when authentication is successful' do
-      let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: true)
-      end
-
-      before do
-        allow(service).to receive(:process_authenticate).with(magic_links_token).and_return(success_response)
-        post :process_authenticate, params: { token: magic_links_token }
-      end
-
-      it 'returns a success response' do
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Action completed successfully')
-      end
-    end
-
-    context 'when authentication fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Authentication error') }
-
-      before do
-        allow(service).to receive(:process_authenticate).with(magic_links_token).and_raise(error)
-        post :process_authenticate, params: { token: magic_links_token }
-      end
-
-      it 'returns an error response' do
-        expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body))
-          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Authentication error')
       end
     end
   end

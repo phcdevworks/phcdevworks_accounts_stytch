@@ -5,15 +5,6 @@ module PhcdevworksAccountsStytch
     class MagicLinksController < ApplicationController
       before_action :set_organization, only: %i[process_login_or_signup process_invite]
 
-      def authenticate
-        if params[:token].blank?
-          log_error('Missing magic link token')
-          render json: { error: 'Magic link token is required.' }, status: :unprocessable_entity
-        else
-          redirect_to b2b_magic_links_process_authenticate_path(token: params[:token])
-        end
-      end
-
       def login_or_signup; end
 
       def process_login_or_signup
@@ -39,20 +30,6 @@ module PhcdevworksAccountsStytch
         end
 
         handle_invite_action
-      end
-
-      def process_authenticate
-        if params[:token].blank?
-          log_error('Missing magic link token')
-          render json: { error: 'Magic link token is required.' }, status: :unprocessable_entity
-          return
-        end
-
-        handle_service_action(:authenticate) do
-          result = service.process_authenticate(params[:token])
-          Rails.logger.info("Authentication successful: #{result.data}")
-          result
-        end
       end
 
       private
