@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe 'PhcdevworksAccountsStytch::B2c::MagicLinksController', type: :routing do
+RSpec.describe 'PhcdevworksAccountsStytch::B2c Routing', type: :routing do
   describe 'routing for B2C' do
-    # GET routes
+    # MagicLinksController GET routes
     it 'routes GET /b2c/magic_links/invite to b2c/magic_links#invite' do
       expect(get: '/b2c/magic_links/invite')
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#invite')
@@ -18,7 +18,7 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2c::MagicLinksController', type: :ro
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#login_or_signup')
     end
 
-    # POST routes
+    # MagicLinksController POST routes
     it 'routes POST /b2c/magic_links/process_invite to b2c/magic_links#process_invite' do
       expect(post: '/b2c/magic_links/process_invite')
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_invite')
@@ -34,10 +34,15 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2c::MagicLinksController', type: :ro
         .to route_to('phcdevworks_accounts_stytch/b2c/magic_links#process_login_or_signup')
     end
 
-    # New consolidated authentication route
-    it 'routes POST /b2c/authenticate to b2c/authenticate#authenticate' do
-      expect(post: '/b2c/authenticate')
+    # AuthenticateController routes
+    it 'routes GET /b2c/authenticate to b2c/authenticate#authenticate' do
+      expect(get: '/b2c/authenticate')
         .to route_to('phcdevworks_accounts_stytch/b2c/authenticate#authenticate')
+    end
+
+    it 'routes POST /b2c/process_authenticate to b2c/authenticate#process_authenticate' do
+      expect(post: '/b2c/process_authenticate')
+        .to route_to('phcdevworks_accounts_stytch/b2c/authenticate#process_authenticate')
     end
   end
 end

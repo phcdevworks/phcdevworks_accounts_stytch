@@ -5,6 +5,23 @@ module PhcdevworksAccountsStytch
     class AuthenticateController < ApplicationController
       def authenticate
         if params[:token].present?
+          redirect_to b2b_process_authenticate_path(token: params[:token])
+        elsif params[:email].present? && params[:password].present? && params[:organization_id].present?
+          redirect_to b2b_process_authenticate_path(email: params[:email], password: params[:password],
+                                                    organization_id: params[:organization_id])
+        else
+          log_error('Missing credentials for authentication')
+          render json: { error: 'Magic link token or email, password, and organization ID are required.' },
+                 status: :unprocessable_entity
+        end
+      rescue StandardError => e
+        log_error("Unexpected error during authentication: #{e.message}")
+        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+      end
+
+      # The combined process_authenticate action
+      def process_authenticate
+        if params[:token].present?
           authenticate_with_magic_link
         elsif params[:email].present? && params[:password].present? && params[:organization_id].present?
           authenticate_with_password
@@ -14,7 +31,7 @@ module PhcdevworksAccountsStytch
                  status: :unprocessable_entity
         end
       rescue StandardError => e
-        log_error("Unexpected error during authentication: #{e.message}")
+        log_error("Unexpected error during authentication process: #{e.message}")
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
 

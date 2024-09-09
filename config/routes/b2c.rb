@@ -9,5 +9,6 @@ namespace :b2c do
   post 'magic_links/process_revoke_invite', to: 'magic_links#process_revoke_invite', as: 'magic_links_process_revoke_invite'
   post 'magic_links/process_login_or_signup', to: 'magic_links#process_login_or_signup', as: 'magic_links_process_login_or_signup'
 
-  post 'authenticate', to: 'authenticate#authenticate', as: :authenticate
+  get 'authenticate', to: 'authenticate#authenticate', as: 'authenticate'
+  match 'process_authenticate', to: 'authenticate#process_authenticate', via: %i[get post], as: 'process_authenticate'
 end
