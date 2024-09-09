@@ -3,32 +3,6 @@
 module PhcdevworksAccountsStytch
   module B2c
     class PasswordsController < ApplicationController
-      def authenticate
-        if missing_required_params?
-          log_error('Missing email or password')
-          render json: { error: 'Email and password are required.' }, status: :unprocessable_entity
-        else
-          redirect_to b2c_passwords_process_authenticate_path(email: params[:email], password: params[:password])
-        end
-      end
-
-      def process_authenticate
-        if missing_required_params?
-          log_error('Missing email or password')
-          render json: { error: 'Email and password are required.' }, status: :unprocessable_entity
-          return
-        end
-
-        handle_service_action(:authenticate) do
-          result = service.authenticate_password(params[:email], params[:password])
-          Rails.logger.info("B2C Authentication successful: #{result.inspect}")
-          result
-        end
-      rescue StandardError => e
-        Rails.logger.error("Unexpected error in process_authenticate: #{e.message}")
-        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
-      end
-
       private
 
       def missing_required_params?

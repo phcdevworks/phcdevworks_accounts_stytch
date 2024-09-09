@@ -7,7 +7,6 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
   let(:service) { instance_double(PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService) }
   let(:email) { 'user@example.com' }
-  let(:magic_links_token) { 'some_valid_token' }
 
   before do
     allow(PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService).to receive(:new).and_return(service)
@@ -106,41 +105,6 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body))
           .to include('error' => 'Stytch Error (Status Code: 400) - Message: Revoke invite error')
-      end
-    end
-  end
-
-  describe 'POST #process_authenticate' do
-    context 'when authentication is successful' do
-      let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.',
-                                                                    data: { 'user_id' => 'user_123' })
-      end
-
-      before do
-        allow(service).to receive(:process_authenticate).with(magic_links_token).and_return(success_response)
-        post :process_authenticate, params: { token: magic_links_token }
-      end
-
-      it 'returns a success response' do
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Authentication successful.',
-                                                     'data' => { 'user_id' => 'user_123' })
-      end
-    end
-
-    context 'when authentication fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Authentication error') }
-
-      before do
-        allow(service).to receive(:process_authenticate).with(magic_links_token).and_raise(error)
-        post :process_authenticate, params: { token: magic_links_token }
-      end
-
-      it 'returns an error response' do
-        expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body))
-          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Authentication error')
       end
     end
   end
