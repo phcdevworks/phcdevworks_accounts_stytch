@@ -21,7 +21,6 @@ rails credentials:edit
 ```
 3. This will open the credentials file in your default text editor (or VSCode if configured). In the file, add your Stytch API credentials under both b2b and b2c keys, as shown below:
 ```yml
-# Stytch
 stytch:
   b2b:
     project_id: <your_b2b_project_id>
