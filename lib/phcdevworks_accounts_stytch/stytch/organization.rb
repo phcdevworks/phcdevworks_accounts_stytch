@@ -7,7 +7,6 @@ module PhcdevworksAccountsStytch
         @client = PhcdevworksAccountsStytch::Stytch::Client.b2b_client
       end
 
-      # Finds the organization by its slug and returns the organization ID
       def find_organization_id_by_slug(slug)
         response = search_organization_by_slug(slug)
         extract_organization_id(response, slug)
@@ -17,7 +16,6 @@ module PhcdevworksAccountsStytch
 
       private
 
-      # Searches for the organization by slug using the Stytch API
       def search_organization_by_slug(slug)
         @client.organizations.search(
           query: {
@@ -29,7 +27,6 @@ module PhcdevworksAccountsStytch
         )
       end
 
-      # Extracts the organization ID from the response Hash
       def extract_organization_id(response, slug)
         organizations = response['organizations']
         if organizations&.any?
@@ -43,7 +40,6 @@ module PhcdevworksAccountsStytch
         end
       end
 
-      # Handles errors raised during the process
       def handle_error(error)
         raise PhcdevworksAccountsStytch::Stytch::Error.new(
           status_code: error.respond_to?(:status_code) ? error.status_code : 500,

@@ -2,7 +2,6 @@
 
 module PhcdevworksAccountsStytch
   module Stytch
-    # Custom error class for handling errors from the Stytch API
     class Error < StandardError
       attr_reader :status_code, :error_code, :error_message
 

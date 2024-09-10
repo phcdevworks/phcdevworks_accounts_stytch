@@ -5,6 +5,8 @@ module PhcdevworksAccountsStytch
     class PasswordsController < ApplicationController
       before_action :set_organization, only: %i[reset_start reset_existing_password reset_with_session]
 
+      def register_form; end
+
       # Step 1: GET action to render the form for starting password reset via email
       def reset_start_form
         # Render the form for the user to input their email and organization_slug

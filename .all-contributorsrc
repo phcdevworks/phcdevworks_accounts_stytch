@@ -1,0 +1,23 @@
+{
+  "projectName": "phcdevworks_accounts_stytch",
+  "projectOwner": "phcdevworks",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "BradPotts",
+      "name": "Brad Potts",
+      "avatar_url": "https://avatars.githubusercontent.com/BradPotts",
+      "profile": "https://github.com/BradPotts",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "commitConvention": null
+}
