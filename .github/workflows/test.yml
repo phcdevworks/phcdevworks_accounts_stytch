@@ -1,6 +1,5 @@
 name: Run tests
 
-# Only enable manual triggering
 on:
   workflow_dispatch:
 
@@ -12,24 +11,36 @@ jobs:
         ruby-version: ['2.7', '3.0', '3.1']
 
     steps:
+    # Step 1: Check out the repository (update to v3)
     - name: Check out repository code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
+    # Step 2: Set up Ruby
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
 
+    # Step 3: Install dependencies (with verbose logging)
     - name: Install dependencies
       run: |
-        bundle install
+        gem install bundler
+        bundle install --verbose
 
+    # Step 4: Set up credentials (copy master key)
+    - name: Set up credentials
+      run: |
+        mkdir -p config
+        echo "${{ secrets.PHCDEV_TEST_KEY }}" > config/master.key
+
+    # Step 5: Set up the database (if required)
     - name: Set up database
       run: |
         cp config/database.yml.ci config/database.yml
         bundle exec rails db:create db:schema:load
-    
+
+    # Step 6: Run tests
     - name: Run tests
       run: |
-        bundle exec rspec
+        bundle exec rspec --backtrace

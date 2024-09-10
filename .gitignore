@@ -13,4 +13,3 @@
 /spec/vcr_cassettes/
 .env
 spec/dummy/config/master.key
-spec/dummy/config/credentials.yml.enc
