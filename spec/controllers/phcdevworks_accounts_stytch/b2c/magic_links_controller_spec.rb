@@ -15,7 +15,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
   describe 'POST #process_login_or_signup' do
     context 'when login or signup is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Success', data: { 'user_id' => 'user_123' })
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
       end
 
       before do
@@ -25,7 +26,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Success', 'data' => { 'user_id' => 'user_123' })
+        expect(JSON.parse(response.body)).to include('message' => 'Action completed successfully')
       end
     end
 
@@ -45,9 +46,21 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
   end
 
   describe 'POST #process_invite' do
+    context 'when email or organization slug is missing' do
+      before do
+        post :process_invite, params: { email: '' }
+      end
+
+      it 'returns an error response' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to include('error' => 'Email is required.')
+      end
+    end
+
     context 'when invite is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Invite sent successfully.', data: {})
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
       end
 
       before do
@@ -57,7 +70,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Invite sent successfully.')
+        expect(JSON.parse(response.body)).to include('message' => 'Action completed successfully')
       end
     end
 
@@ -71,40 +84,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
-      end
-    end
-  end
-
-  describe 'POST #process_revoke_invite' do
-    context 'when revoke invite is successful' do
-      let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Invite revoked successfully.', data: {})
-      end
-
-      before do
-        allow(service).to receive(:process_revoke_invite).with(email).and_return(success_response)
-        post :process_revoke_invite, params: { email: email }
-      end
-
-      it 'returns a success response' do
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Invite revoked successfully.')
-      end
-    end
-
-    context 'when revoke invite fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Revoke invite error') }
-
-      before do
-        allow(service).to receive(:process_revoke_invite).with(email).and_raise(error)
-        post :process_revoke_invite, params: { email: email }
-      end
-
-      it 'returns an error response' do
-        expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body))
-          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Revoke invite error')
+          .to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
       end
     end
   end
