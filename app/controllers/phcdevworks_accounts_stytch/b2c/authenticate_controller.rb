@@ -4,25 +4,57 @@ module PhcdevworksAccountsStytch
   module B2c
     class AuthenticateController < ApplicationController
       def authenticate
-        if params[:token].present?
-          authenticate_with_magic_link
-        elsif params[:email].present? && params[:password].present?
-          authenticate_with_password
+        if magic_link_token_present?
+          handle_magic_link_authentication
+        elsif email_and_password_present?
+          handle_password_authentication
         else
-          log_error('Missing credentials for authentication')
-          render json: { error: 'Either magic link token or email and password are required.' }, status: :unprocessable_entity
+          handle_missing_credentials
         end
       rescue StandardError => e
-        log_error("Unexpected error during authentication: #{e.message}")
-        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+        handle_unexpected_error(e)
+      end
+
+      def process_authenticate
+        if magic_link_token_present?
+          authenticate_with_magic_link
+        elsif email_and_password_present?
+          authenticate_with_password
+        else
+          handle_missing_credentials
+        end
+      rescue StandardError => e
+        handle_unexpected_error(e)
       end
 
       private
 
+      def magic_link_token_present?
+        params[:token].present?
+      end
+
+      def email_and_password_present?
+        params[:email].present? && params[:password].present?
+      end
+
+      def handle_magic_link_authentication
+        redirect_to b2c_process_authenticate_path(token: params[:token])
+      end
+
+      def handle_password_authentication
+        redirect_to b2c_process_authenticate_path(email: params[:email], password: params[:password])
+      end
+
+      def handle_missing_credentials
+        log_error('Missing credentials for authentication')
+        render json: { error: 'Magic link token or email and password are required.' },
+               status: :unprocessable_entity
+      end
+
       def authenticate_with_magic_link
         handle_service_action(:magic_link_authenticate) do
           result = magic_link_service.process_authenticate(params[:token])
-          Rails.logger.info("Magic Link Authentication successful: #{result.data}")
+          Rails.logger.info("Magic Link Authentication successful: #{result[:data]}")
           result
         end
       end
@@ -47,9 +79,14 @@ module PhcdevworksAccountsStytch
         Rails.logger.error(message)
       end
 
+      def handle_unexpected_error(exception)
+        log_error("Unexpected error during authentication: #{exception.message}")
+        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+      end
+
       def handle_service_action(action_name)
         result = yield
-        render json: { message: result.message, data: result.data }, status: :ok
+        render json: { message: result[:message], data: result[:data] }, status: :ok
       rescue PhcdevworksAccountsStytch::Stytch::Error => e
         log_error("Stytch API error during #{action_name}: #{e.message}")
         render json: { error: e.message }, status: :bad_request

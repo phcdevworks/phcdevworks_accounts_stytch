@@ -16,7 +16,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
     allow(PhcdevworksAccountsStytch::Authentication::B2c::PasswordService).to receive(:new).and_return(password_service)
   end
 
-  describe 'POST #authenticate' do
+  describe 'POST #process_authenticate' do
     context 'when authenticating with a magic link token' do
       let(:success_response) do
         instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.',
@@ -25,7 +25,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
 
       before do
         allow(magic_link_service).to receive(:process_authenticate).with(magic_links_token).and_return(success_response)
-        post :authenticate, params: { token: magic_links_token }
+        post :process_authenticate, params: { token: magic_links_token }
       end
 
       it 'returns a success response for magic link authentication' do
@@ -40,7 +40,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
 
       before do
         allow(magic_link_service).to receive(:process_authenticate).with(magic_links_token).and_raise(error)
-        post :authenticate, params: { token: magic_links_token }
+        post :process_authenticate, params: { token: magic_links_token }
       end
 
       it 'returns an error response for magic link authentication failure' do
@@ -57,8 +57,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
       end
 
       before do
-        allow(password_service).to receive(:authenticate_password).with(email, password).and_return(success_response)
-        post :authenticate, params: { email: email, password: password }
+        allow(password_service).to receive(:authenticate_password).with(email, password)
+                                                                  .and_return(success_response)
+        post :process_authenticate, params: { email: email, password: password }
       end
 
       it 'returns a success response for password authentication' do
@@ -72,8 +73,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
       let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Authentication error') }
 
       before do
-        allow(password_service).to receive(:authenticate_password).with(email, password).and_raise(error)
-        post :authenticate, params: { email: email, password: password }
+        allow(password_service).to receive(:authenticate_password).with(email, password)
+                                                                  .and_raise(error)
+        post :process_authenticate, params: { email: email, password: password }
       end
 
       it 'returns an error response for password authentication failure' do
@@ -83,14 +85,15 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::AuthenticateController, type: :co
       end
     end
 
-    context 'when both token and email/password are missing' do
+    context 'when credentials are missing' do
       before do
-        post :authenticate, params: {}
+        post :process_authenticate, params: {}
       end
 
       it 'returns an unprocessable entity response' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to include('error' => 'Either magic link token or email and password are required.')
+        expect(JSON.parse(response.body))
+          .to include('error' => 'Magic link token or email and password are required.')
       end
     end
   end
