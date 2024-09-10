@@ -30,8 +30,7 @@ jobs:
     # Step 4: Set up testing key
     - name: Set up key for testing
       run: |
-        mkdir -p config
-        echo "${{ secrets.PHCDEV_TEST_KEY }}" > config/master.key
+        echo "${{ secrets.PHCDEV_TEST_KEY }}" > spec/dummy/config/master.key
 
     # Step 6: Run tests
     - name: Run tests
