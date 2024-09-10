@@ -27,17 +27,11 @@ jobs:
         gem install bundler
         bundle install --verbose
 
-    # Step 4: Set up credentials (copy master key)
-    - name: Set up credentials
+    # Step 4: Set up testing key
+    - name: Set up key for testing
       run: |
         mkdir -p config
         echo "${{ secrets.PHCDEV_TEST_KEY }}" > config/master.key
-
-    # Step 5: Set up the database (if required)
-    - name: Set up database
-      run: |
-        cp config/database.yml.ci config/database.yml
-        bundle exec rails db:create db:schema:load
 
     # Step 6: Run tests
     - name: Run tests
