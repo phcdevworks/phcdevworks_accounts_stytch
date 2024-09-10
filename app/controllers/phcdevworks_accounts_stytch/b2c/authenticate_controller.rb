@@ -54,7 +54,7 @@ module PhcdevworksAccountsStytch
       def authenticate_with_magic_link
         handle_service_action(:magic_link_authenticate) do
           result = magic_link_service.process_authenticate(params[:token])
-          Rails.logger.info("Magic Link Authentication successful: #{result[:data]}")
+          Rails.logger.info("Magic Link Authentication successful: #{result.data}")
           result
         end
       end
@@ -86,7 +86,7 @@ module PhcdevworksAccountsStytch
 
       def handle_service_action(action_name)
         result = yield
-        render json: { message: result[:message], data: result[:data] }, status: :ok
+        render json: { message: result.message, data: result.data }, status: :ok
       rescue PhcdevworksAccountsStytch::Stytch::Error => e
         log_error("Stytch API error during #{action_name}: #{e.message}")
         render json: { error: e.message }, status: :bad_request
