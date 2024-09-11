@@ -8,9 +8,8 @@ module PhcdevworksAccountsStytch
       def login_or_signup; end
 
       def process_login_or_signup
-        if params[:email].blank? || @organization_id.blank?
-          log_error('Missing email or organization slug')
-          render json: { error: 'Email and Organization Slug are required.' }, status: :unprocessable_entity
+        if missing_login_or_signup_params?
+          handle_missing_params_error('Email and Organization Slug are required.')
           return
         end
 
@@ -24,23 +23,19 @@ module PhcdevworksAccountsStytch
       def invite; end
 
       def process_invite
-        if missing_required_params?
-          handle_missing_params_error
+        if missing_invite_params?
+          handle_missing_params_error('Email and Organization Slug are required.')
           return
         end
 
-        handle_invite_action
-      end
-
-      private
-
-      def handle_invite_action
         handle_service_action(:invite) do
           result = service.process_invite(params[:email], @organization_id, params[:session_token])
           Rails.logger.info("Invite successful: #{result.data}")
           result
         end
       end
+
+      private
 
       def set_organization
         organization_service = PhcdevworksAccountsStytch::Stytch::Organization.new
@@ -65,12 +60,16 @@ module PhcdevworksAccountsStytch
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
 
-      def handle_missing_params_error
-        log_error('Missing email or organization slug')
-        render json: { error: 'Email and Organization Slug are required.' }, status: :unprocessable_entity
+      def handle_missing_params_error(message)
+        log_error(message)
+        render json: { error: message }, status: :unprocessable_entity
       end
 
-      def missing_required_params?
+      def missing_login_or_signup_params?
+        params[:email].blank? || @organization_id.blank?
+      end
+
+      def missing_invite_params?
         params[:email].blank? || @organization_id.blank?
       end
 
