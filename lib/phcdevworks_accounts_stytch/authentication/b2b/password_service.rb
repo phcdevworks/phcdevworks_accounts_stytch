@@ -47,6 +47,12 @@ module PhcdevworksAccountsStytch
           handle_response(response)
         end
 
+        def process_authenticate(magic_links_token)
+          log_action('Authenticate', magic_links_token: magic_links_token)
+          response = @client.magic_links.authenticate(magic_links_token: magic_links_token)
+          handle_response(response)
+        end
+
         private
 
         def handle_response(response)
@@ -54,6 +60,12 @@ module PhcdevworksAccountsStytch
         rescue PhcdevworksAccountsStytch::Stytch::Error => e
           log_error(e)
           raise
+        end
+
+        def build_method_options(session_token)
+          PhcdevworksAccountsStytch::Stytch::MethodOptions.new(
+            authorization: { session_token: session_token }
+          )
         end
 
         def log_action(action_name, details = {})
