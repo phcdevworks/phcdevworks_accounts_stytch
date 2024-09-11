@@ -3,20 +3,19 @@
 module PhcdevworksAccountsStytch
   module B2b
     class PasswordsController < ApplicationController
-      before_action :set_organization, only: %i[reset_start reset_existing]
+      before_action :set_organization, only: %i[process_reset_start process_reset_existing_password process_reset_with_session]
 
       def reset_start; end
 
       def process_reset_start
         if missing_reset_start_params?
-          log_error('Missing email or organization slug')
-          render json: { error: 'Email and Organization Slug are required.' }, status: :unprocessable_entity
+          handle_missing_params_error('Email and Organization Slug are required.')
           return
         end
 
         handle_service_action(:reset_start) do
           result = service.reset_start(params[:email], @organization_id)
-          Rails.logger.info("Login or Signup successful: #{result.data}")
+          Rails.logger.info("Password Reset Start successful: #{result.data}")
           result
         end
       end
@@ -25,12 +24,11 @@ module PhcdevworksAccountsStytch
 
       def process_reset_password
         if missing_reset_password_params?
-          log_error('Missing Token and Password.')
-          render json: { error: 'Token and Password are required.' }, status: :unprocessable_entity
+          handle_missing_params_error('Token and Password are required.')
           return
         end
 
-        handle_service_action(:reset) do
+        handle_service_action(:reset_password) do
           result = service.reset(params[:token], params[:password])
           Rails.logger.info("Password Reset Successful: #{result.data}")
           result
@@ -41,15 +39,13 @@ module PhcdevworksAccountsStytch
 
       def process_reset_existing_password
         if missing_existing_password_params?
-          log_error('Missing Email, old password, new password, and organization ID')
-          render json: { error: 'Email, old password, new password, and organization ID are required.' },
-                 status: :unprocessable_entity
+          handle_missing_params_error('Email, old password, new password, and organization ID are required.')
           return
         end
 
-        handle_service_action(:reset_existing) do
+        handle_service_action(:reset_existing_password) do
           result = service.reset_existing(params[:email], params[:old_password], params[:new_password], @organization_id)
-          Rails.logger.info("Password Reset Successful: #{result.data}")
+          Rails.logger.info("Existing Password Reset Successful: #{result.data}")
           result
         end
       end
@@ -58,14 +54,13 @@ module PhcdevworksAccountsStytch
 
       def process_reset_with_session
         if missing_reset_with_session_params?
-          log_error('Missing Session token, new password, and organization ID')
-          render json: { error: 'Session token, new password, and organization ID are required.' }, status: :unprocessable_entity
+          handle_missing_params_error('Session token, new password, and organization ID are required.')
           return
         end
 
         handle_service_action(:reset_with_session) do
           result = service.reset_with_session(params[:session_token], params[:password], @organization_id)
-          Rails.logger.info("Password Reset Successful: #{result.data}")
+          Rails.logger.info("Session-based Password Reset Successful: #{result.data}")
           result
         end
       end
@@ -109,6 +104,11 @@ module PhcdevworksAccountsStytch
 
       def missing_reset_with_session_params?
         params[:session_token].blank? || params[:password].blank? || @organization_id.blank?
+      end
+
+      def handle_missing_params_error(message)
+        log_error(message)
+        render json: { error: message }, status: :unprocessable_entity
       end
 
       def service

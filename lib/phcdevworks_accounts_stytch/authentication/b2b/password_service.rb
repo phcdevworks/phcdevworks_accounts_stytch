@@ -18,7 +18,7 @@ module PhcdevworksAccountsStytch
         end
 
         def reset(password_reset_token, new_password)
-          log_action('Password Reset', password_reset_token: password_reset_token)
+          log_action('Password Reset', token: password_reset_token)
           response = @client.passwords.email.reset(
             password_reset_token: password_reset_token,
             password: new_password
@@ -47,9 +47,13 @@ module PhcdevworksAccountsStytch
           handle_response(response)
         end
 
-        def process_authenticate(magic_links_token)
-          log_action('Authenticate', magic_links_token: magic_links_token)
-          response = @client.magic_links.authenticate(magic_links_token: magic_links_token)
+        def authenticate_password(email, password, organization_id)
+          log_action('Password Authentication', email: email, organization_id: organization_id)
+          response = @client.passwords.authenticate(
+            email_address: email,
+            password: password,
+            organization_id: organization_id
+          )
           handle_response(response)
         end
 
@@ -60,12 +64,6 @@ module PhcdevworksAccountsStytch
         rescue PhcdevworksAccountsStytch::Stytch::Error => e
           log_error(e)
           raise
-        end
-
-        def build_method_options(session_token)
-          PhcdevworksAccountsStytch::Stytch::MethodOptions.new(
-            authorization: { session_token: session_token }
-          )
         end
 
         def log_action(action_name, details = {})
