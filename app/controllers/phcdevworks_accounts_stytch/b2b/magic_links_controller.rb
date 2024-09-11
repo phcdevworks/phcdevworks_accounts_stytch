@@ -34,6 +34,14 @@ module PhcdevworksAccountsStytch
 
       private
 
+      def handle_invite_action
+        handle_service_action(:invite) do
+          result = service.process_invite(params[:email], @organization_id, params[:session_token])
+          Rails.logger.info("Invite successful: #{result.data}")
+          result
+        end
+      end
+
       def set_organization
         organization_service = PhcdevworksAccountsStytch::Stytch::Organization.new
         @organization_id = organization_service.find_organization_id_by_slug(params[:organization_slug])
@@ -55,14 +63,6 @@ module PhcdevworksAccountsStytch
       rescue StandardError => e
         log_error("Unexpected error during #{action_name}: #{e.message}")
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
-      end
-
-      def handle_invite_action
-        handle_service_action(:invite) do
-          result = service.process_invite(params[:email], @organization_id, params[:session_token])
-          Rails.logger.info("Invite successful: #{result.data}")
-          result
-        end
       end
 
       def handle_missing_params_error

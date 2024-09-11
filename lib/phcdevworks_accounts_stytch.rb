@@ -6,5 +6,4 @@ require 'phcdevworks_accounts_stytch/version'
 require 'phcdevworks_accounts_stytch/stytch/client'
 
 module PhcdevworksAccountsStytch
-  # Your code goes here...
 end
