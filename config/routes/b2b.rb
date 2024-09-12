@@ -11,17 +11,15 @@ namespace :b2b do
                                                                  as: 'magic_links_process_login_or_signup'
 
   # PHCDEVWORKS - B2B Routes for Passwords
-  get 'passwords/reset/start', to: 'passwords#reset_start_form', as: 'password_reset_start_form'
-  post 'passwords/reset/start', to: 'passwords#reset_start', as: 'password_reset_start'
+  get 'passwords/reset', to: 'passwords#reset_password', as: 'password_reset'
+  get 'passwords/reset/existing', to: 'passwords#reset_existing_password', as: 'password_reset_existing'
+  get 'passwords/reset/session', to: 'passwords#reset_with_session', as: 'password_reset_session'
+  get 'passwords/reset/start', to: 'passwords#reset_start', as: 'password_reset_start'
 
-  get 'passwords/reset', to: 'passwords#reset_form', as: 'password_reset_form'
-  post 'passwords/reset', to: 'passwords#reset_process', as: 'password_reset_process'
-
-  get 'passwords/reset/existing', to: 'passwords#reset_existing_password_form', as: 'password_reset_existing_form'
-  post 'passwords/reset/existing', to: 'passwords#reset_existing_password', as: 'password_reset_existing'
-
-  get 'passwords/reset/session', to: 'passwords#reset_with_session_form', as: 'password_reset_session_form'
-  post 'passwords/reset/session', to: 'passwords#reset_with_session', as: 'password_reset_session'
+  post 'passwords/reset', to: 'passwords#process_reset_password', as: 'process_password_reset'
+  post 'passwords/reset/existing', to: 'passwords#process_reset_existing_password', as: 'process_reset_existing_password'
+  post 'passwords/reset/session', to: 'passwords#process_reset_with_session', as: 'process_reset_session'
+  post 'passwords/reset/start', to: 'passwords#process_reset_start', as: 'process_reset_start'
 
   # PHCDEVWORKS - B2B Authentication Routes for both Passwords and Magic Links
   get 'authenticate', to: 'authenticate#authenticate', as: 'authenticate'

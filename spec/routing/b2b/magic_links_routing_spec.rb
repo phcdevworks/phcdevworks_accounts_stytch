@@ -50,67 +50,67 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2b Routing', type: :routing do
   end
 
   # PasswordsController routes
-  it 'routes GET /b2b/passwords/reset/start to b2b/passwords#reset_start_form' do
+  it 'routes GET /b2b/passwords/reset/start to b2b/passwords#reset_start' do
     expect(get: '/b2b/passwords/reset/start')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_start_form'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset/start to b2b/passwords#reset_start' do
-    expect(post: '/b2b/passwords/reset/start')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
         action: 'reset_start'
       )
   end
 
-  it 'routes GET /b2b/passwords/reset to b2b/passwords#reset_form' do
+  it 'routes POST /b2b/passwords/reset/start to b2b/passwords#process_reset_start' do
+    expect(post: '/b2b/passwords/reset/start')
+      .to route_to(
+        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
+        action: 'process_reset_start'
+      )
+  end
+
+  it 'routes GET /b2b/passwords/reset to b2b/passwords#reset_password' do
     expect(get: '/b2b/passwords/reset')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_form'
+        action: 'reset_password'
       )
   end
 
-  it 'routes POST /b2b/passwords/reset to b2b/passwords#reset_process' do
+  it 'routes POST /b2b/passwords/reset to b2b/passwords#process_reset_password' do
     expect(post: '/b2b/passwords/reset')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_process'
+        action: 'process_reset_password'
       )
   end
 
-  it 'routes GET /b2b/passwords/reset/existing to b2b/passwords#reset_existing_password_form' do
+  it 'routes GET /b2b/passwords/reset/existing to b2b/passwords#reset_existing_password' do
     expect(get: '/b2b/passwords/reset/existing')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_existing_password_form'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset/existing to b2b/passwords#reset_existing_password' do
-    expect(post: '/b2b/passwords/reset/existing')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
         action: 'reset_existing_password'
       )
   end
 
-  it 'routes GET /b2b/passwords/reset/session to b2b/passwords#reset_with_session_form' do
-    expect(get: '/b2b/passwords/reset/session')
+  it 'routes POST /b2b/passwords/reset/existing to b2b/passwords#process_reset_existing_password' do
+    expect(post: '/b2b/passwords/reset/existing')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_with_session_form'
+        action: 'process_reset_existing_password'
       )
   end
 
-  it 'routes POST /b2b/passwords/reset/session to b2b/passwords#reset_with_session' do
-    expect(post: '/b2b/passwords/reset/session')
+  it 'routes GET /b2b/passwords/reset/session to b2b/passwords#reset_with_session' do
+    expect(get: '/b2b/passwords/reset/session')
       .to route_to(
         controller: 'phcdevworks_accounts_stytch/b2b/passwords',
         action: 'reset_with_session'
+      )
+  end
+
+  it 'routes POST /b2b/passwords/reset/session to b2b/passwords#process_reset_with_session' do
+    expect(post: '/b2b/passwords/reset/session')
+      .to route_to(
+        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
+        action: 'process_reset_with_session'
       )
   end
 

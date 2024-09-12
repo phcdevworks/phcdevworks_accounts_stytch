@@ -8,6 +8,7 @@ gem 'sprockets-rails'
 
 group :development, :test do
   gem 'bundler', '~> 2.5'
+  gem 'capybara', '~> 3.40'
   gem 'dotenv-rails', '~> 3.1'
   gem 'factory_bot', '~> 6.4', '>= 6.4.6'
   gem 'factory_bot_rails', '~> 6.4', '>= 6.4.3', require: false

@@ -18,6 +18,7 @@ end
 RSpec.configure do |config|
   config.fixture_paths = [Rails.root.join('spec/fixtures')]
   config.use_transactional_fixtures = true
+  config.render_views
 
   # Uncomment this line to disable ActiveRecord support.
   # config.use_active_record = false

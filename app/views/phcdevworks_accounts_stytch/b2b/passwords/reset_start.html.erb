@@ -1,17 +1,17 @@
-<h1>Reset Your Password</h1>
+<h1>Reset Password</h1>
 
-<%= form_with url: b2b_password_reset_start_path, method: :post, local: true do |form| %>
-  <div class="form-group">
-    <%= form.label :email, 'Enter your email address' %>
-    <%= form.email_field :email, class: 'form-control', required: true %>
+<%= form_with url: phcdevworks_accounts_stytch.b2b_process_reset_start_path, method: :post do |form| %>
+  <div>
+    <%= form.label :email, "Email" %>
+    <%= form.email_field :email, required: true %>
   </div>
-  <div class="form-group">
-    <%= form.label :organization_slug, 'Organization Slug' %>
-    <%= form.text_field :organization_slug, class: 'form-control', required: true %>
+
+  <div>
+    <%= form.label :organization_slug, "Organization Slug" %>
+    <%= form.text_field :organization_slug, required: true %>
   </div>
-  <div class="form-group">
-    <%= form.submit 'Send Reset Instructions', class: 'btn btn-primary' %>
+
+  <div>
+    <%= form.submit "Send Reset Instructions" %>
   </div>
 <% end %>
-
-<%= link_to 'Back to login', login_path %>

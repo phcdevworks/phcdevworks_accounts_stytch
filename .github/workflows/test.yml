@@ -1,6 +1,7 @@
 name: Run RSpec Tests
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
       run: |
         echo "${{ secrets.PHCDEV_TEST_KEY }}" > spec/dummy/config/master.key
 
-    # Step 6: Run tests
+    # Step 5: Run tests
     - name: Run tests
       run: |
         bundle exec rspec --backtrace
