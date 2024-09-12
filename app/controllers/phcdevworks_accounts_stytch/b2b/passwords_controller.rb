@@ -3,6 +3,10 @@
 module PhcdevworksAccountsStytch
   module B2b
     class PasswordsController < ApplicationController
+      include ErrorHandler
+      include OrganizationSetter
+      include HandleServiceAction
+
       before_action :set_organization, only: %i[process_reset_start process_reset_existing_password process_reset_with_session]
 
       def reset_start; end
@@ -67,29 +71,6 @@ module PhcdevworksAccountsStytch
 
       private
 
-      def set_organization
-        organization_service = PhcdevworksAccountsStytch::Stytch::Organization.new
-        @organization_id = organization_service.find_organization_id_by_slug(params[:organization_slug])
-      rescue PhcdevworksAccountsStytch::Stytch::Error => e
-        log_error(e.message)
-        render json: { error: e.message }, status: :not_found
-      end
-
-      def handle_service_action(action_name)
-        result = yield
-        if result.is_a?(Hash) && result.key?(:message)
-          render json: { message: result[:message], data: result[:data] }, status: :ok
-        else
-          render json: { message: 'Action completed successfully', data: result }, status: :ok
-        end
-      rescue PhcdevworksAccountsStytch::Stytch::Error => e
-        log_error("Stytch API error during #{action_name}: #{e.message}")
-        render json: { error: e.message }, status: :bad_request
-      rescue StandardError => e
-        log_error("Unexpected error during #{action_name}: #{e.message}")
-        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
-      end
-
       def missing_reset_start_params?
         params[:email].blank? || @organization_id.blank?
       end
@@ -106,17 +87,8 @@ module PhcdevworksAccountsStytch
         params[:session_token].blank? || params[:password].blank? || @organization_id.blank?
       end
 
-      def handle_missing_params_error(message)
-        log_error(message)
-        render json: { error: message }, status: :unprocessable_entity
-      end
-
       def service
         PhcdevworksAccountsStytch::Authentication::B2b::PasswordService.new
-      end
-
-      def log_error(message)
-        Rails.logger.error(message)
       end
     end
   end

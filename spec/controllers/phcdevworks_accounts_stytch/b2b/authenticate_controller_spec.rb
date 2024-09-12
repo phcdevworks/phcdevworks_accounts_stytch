@@ -20,8 +20,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
   describe 'POST #process_authenticate' do
     context 'when authenticating with a magic link token' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.',
-                                                                    data: { 'user_id' => 'user_123' })
+        PhcdevworksAccountsStytch::Stytch::Success.new(
+          status_code: 200,
+          message: 'Authentication successful.',
+          data: { 'user_id' => 'user_123' }
+        )
       end
 
       before do
@@ -30,9 +33,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
 
       it 'returns a success response for magic link authentication' do
+        parsed_response = JSON.parse(response.body)
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Authentication successful.',
-                                                     'data' => { 'user_id' => 'user_123' })
+        expect(parsed_response['message']).to eq('Action completed successfully')
+        expect(parsed_response['data']['data']).to include('user_id' => 'user_123')
+        expect(parsed_response['data']['message']).to eq('Authentication successful.')
       end
     end
 
@@ -53,8 +58,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
 
     context 'when authenticating with email, password, and organization ID' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Authentication successful.',
-                                                                    data: { 'user_id' => 'user_123' })
+        PhcdevworksAccountsStytch::Stytch::Success.new(
+          status_code: 200,
+          message: 'Authentication successful.',
+          data: { 'user_id' => 'user_123' }
+        )
       end
 
       before do
@@ -64,9 +72,11 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
 
       it 'returns a success response for password authentication' do
+        parsed_response = JSON.parse(response.body)
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Authentication successful.',
-                                                     'data' => { 'user_id' => 'user_123' })
+        expect(parsed_response['message']).to eq('Action completed successfully')
+        expect(parsed_response['data']['data']).to include('user_id' => 'user_123')
+        expect(parsed_response['data']['message']).to eq('Authentication successful.')
       end
     end
 
