@@ -1,6 +1,6 @@
-# frozen_string_literal: true
+require 'rails_helper'
 
-RSpec.describe 'PhcdevworksAccountsStytch::B2b Routing', type: :routing do
+RSpec.describe 'PhcdevworksAccountsStytch::B2b Magic Links Routing', type: :routing do
   let(:organization_slug) { 'example-org' }
 
   # MagicLinksController routes
@@ -46,88 +46,6 @@ RSpec.describe 'PhcdevworksAccountsStytch::B2b Routing', type: :routing do
         controller: 'phcdevworks_accounts_stytch/b2b/magic_links',
         action: 'process_login_or_signup',
         organization_slug: organization_slug
-      )
-  end
-
-  # PasswordsController routes
-  it 'routes GET /b2b/passwords/reset/start to b2b/passwords#reset_start' do
-    expect(get: '/b2b/passwords/reset/start')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_start'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset/start to b2b/passwords#process_reset_start' do
-    expect(post: '/b2b/passwords/reset/start')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'process_reset_start'
-      )
-  end
-
-  it 'routes GET /b2b/passwords/reset to b2b/passwords#reset_password' do
-    expect(get: '/b2b/passwords/reset')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_password'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset to b2b/passwords#process_reset_password' do
-    expect(post: '/b2b/passwords/reset')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'process_reset_password'
-      )
-  end
-
-  it 'routes GET /b2b/passwords/reset/existing to b2b/passwords#reset_existing_password' do
-    expect(get: '/b2b/passwords/reset/existing')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_existing_password'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset/existing to b2b/passwords#process_reset_existing_password' do
-    expect(post: '/b2b/passwords/reset/existing')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'process_reset_existing_password'
-      )
-  end
-
-  it 'routes GET /b2b/passwords/reset/session to b2b/passwords#reset_with_session' do
-    expect(get: '/b2b/passwords/reset/session')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'reset_with_session'
-      )
-  end
-
-  it 'routes POST /b2b/passwords/reset/session to b2b/passwords#process_reset_with_session' do
-    expect(post: '/b2b/passwords/reset/session')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/passwords',
-        action: 'process_reset_with_session'
-      )
-  end
-
-  # AuthenticateController routes
-  it 'routes GET /b2b/authenticate to b2b/authenticate#authenticate' do
-    expect(get: '/b2b/authenticate')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/authenticate',
-        action: 'authenticate'
-      )
-  end
-
-  it 'routes POST /b2b/process_authenticate to b2b/authenticate#process_authenticate' do
-    expect(post: '/b2b/process_authenticate')
-      .to route_to(
-        controller: 'phcdevworks_accounts_stytch/b2b/authenticate',
-        action: 'process_authenticate'
       )
   end
 end
