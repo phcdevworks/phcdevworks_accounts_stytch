@@ -10,7 +10,7 @@ namespace :b2b do
   post 'magic_links/process_login_or_signup/:organization_slug', to: 'magic_links#process_login_or_signup',
                                                                  as: 'magic_links_process_login_or_signup'
 
-  # PHCDEVWORKS - B2B Routes for Passwords (with organization_slug)
+  # PHCDEVWORKS - B2B Routes for Passwords
   get 'passwords/reset/:organization_slug', to: 'passwords#reset_password', as: 'password_reset'
   get 'passwords/reset/existing/:organization_slug', to: 'passwords#reset_existing_password', as: 'password_reset_existing'
   get 'passwords/reset/session/:organization_slug', to: 'passwords#reset_with_session', as: 'password_reset_session'
