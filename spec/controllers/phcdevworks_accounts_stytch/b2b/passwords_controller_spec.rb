@@ -32,7 +32,10 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
     end
 
     context 'when reset is successful' do
-      let(:success_response) { instance_double('SuccessResponse', data: { 'user_id' => 'user_123' }) }
+      let(:success_response) do
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
+      end
 
       before do
         allow(service).to receive(:reset).with(token, password).and_return(success_response)
@@ -78,7 +81,10 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
     end
 
     context 'when reset existing is successful' do
-      let(:success_response) { instance_double('SuccessResponse', data: { 'user_id' => 'user_123' }) }
+      let(:success_response) do
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
+      end
 
       before do
         allow(service).to receive(:reset_existing).with(email, old_password, password,
@@ -126,7 +132,10 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
     end
 
     context 'when reset with session is successful' do
-      let(:success_response) { instance_double('SuccessResponse', data: { 'user_id' => 'user_123' }) }
+      let(:success_response) do
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
+      end
 
       before do
         allow(service).to receive(:reset_with_session).with(session_token, password, organization_id).and_return(success_response)
