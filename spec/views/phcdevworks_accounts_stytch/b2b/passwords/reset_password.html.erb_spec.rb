@@ -11,7 +11,8 @@ RSpec.describe 'phcdevworks_accounts_stytch/b2b/passwords/reset_password.html.er
     render
 
     expect(rendered).to have_selector("form[action='#{
-      phcdevworks_accounts_stytch.b2b_process_password_reset_path(organization_slug: 'example-slug')}'][method='post']")
+      phcdevworks_accounts_stytch.b2b_process_password_reset_path(organization_slug: 'example-slug')
+    }'][method='post']")
 
     expect(rendered).to have_selector('input[name="token"][type="text"][required]')
 
