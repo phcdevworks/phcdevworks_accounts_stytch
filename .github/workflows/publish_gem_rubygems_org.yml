@@ -1,9 +1,7 @@
 name: Publish to Rubygems.org
 
 on:
-  push:
-    tags:
-      - v*
+  workflow_dispatch:  # Allows you to trigger the workflow manually
 
 jobs:
   build:
@@ -28,9 +26,14 @@ jobs:
         gem install bundler
         bundle install
 
+    # Set up testing master.key
+    - name: Set up key for testing
+      run: |
+        echo "${{ secrets.PHCDEV_TEST_KEY }}" > spec/dummy/config/master.key
+
     # Run RSpec tests
     - name: Run RSpec
-      run: bundle exec rspec
+      run: bundle exec rspec --backtrace
 
     # Publish to RubyGems if tests pass
     - name: Publish to RubyGems
