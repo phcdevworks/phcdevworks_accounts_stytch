@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    phcdevworks_accounts_stytch (0.1.0.pre.1)
+    phcdevworks_accounts_stytch (0.1.0.pre.2)
       rails (~> 7.2)
       stytch (~> 9.1)
 
@@ -126,7 +126,7 @@ GEM
     globalid (1.2.1)
       activesupport (>= 6.1)
     hashdiff (1.1.1)
-    i18n (1.14.5)
+    i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
     irb (1.14.0)
@@ -140,7 +140,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    jwt (2.8.2)
+    jwt (2.9.0)
       base64
     language_server-protocol (3.17.0.3)
     logger (1.6.1)
@@ -312,7 +312,7 @@ GEM
     timeout (0.4.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (2.5.0)
+    unicode-display_width (2.6.0)
     uri (0.13.1)
     useragent (0.16.10)
     vcr (6.3.1)
