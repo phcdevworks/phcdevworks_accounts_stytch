@@ -11,7 +11,11 @@
 ![Stars](https://img.shields.io/github/stars/phcdevworks/phcdevworks_accounts_stytch.svg?style=social)
 [![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fphcdevworks%2Fphcdevworks_accounts_stytch)](https://twitter.com/intent/tweet?text=Check%20out%20this%20authentication%20gem%20for%20Rails%20integrating%20with%20Stytch!%20https://github.com/phcdevworks/phcdevworks_accounts_stytch)
 
+## Overview
+
 PHCDevworks Accounts Stytch is an authentication system that integrates with the Stytch API to provide seamless B2B and B2C user authentication for Ruby on Rails apps. The project includes:
+
+## Key Features:
 
 - **Magic Link Authentication**: Users can authenticate via secure magic links sent to their email.
 - **Password Authentication**: Support for password-based login and reset flows, including registration and session management.
