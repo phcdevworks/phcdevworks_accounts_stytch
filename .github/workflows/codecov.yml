@@ -33,6 +33,7 @@ jobs:
     # Step 4: Run tests with SimpleCov for coverage and generate RSpec results
     - name: Run tests and generate coverage
       run: |
+        echo "${{ secrets.PHCDEV_TEST_KEY }}" > spec/dummy/config/master.key
         mkdir -p tmp
         bundle exec rspec --format json --out tmp/rspec_results.json
 
