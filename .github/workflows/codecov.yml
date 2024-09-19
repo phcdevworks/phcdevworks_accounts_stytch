@@ -1,0 +1,51 @@
+name: "Run Tests and Upload Coverage"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Ruby environment
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        gem install bundler
+        bundle install
+
+    # Step 4: Run tests with SimpleCov for coverage and generate RSpec results
+    - name: Run tests and generate coverage
+      run: |
+        mkdir -p tmp
+        bundle exec rspec --format json --out tmp/rspec_results.json
+
+    # Step 5: Upload RSpec test results (test analytics)
+    - name: Upload RSpec test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: rspec-results
+        path: tmp/rspec_results.json
+
+    # Step 6: Upload coverage to Codecov
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: coverage/.resultset.json
+        token: ${{ secrets.CODECOV_TOKEN }}

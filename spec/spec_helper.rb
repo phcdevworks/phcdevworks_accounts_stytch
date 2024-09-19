@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'
+  add_filter 'lib/ruby_api_pack_cloudways/version'
+  track_files 'lib/ruby_api_pack_cloudways/**/*.rb'
+  enable_coverage :branch
+end
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
