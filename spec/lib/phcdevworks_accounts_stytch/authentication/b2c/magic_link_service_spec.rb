@@ -69,6 +69,32 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
     end
   end
 
+  describe '#process_revoke_invite' do
+    context 'when revoke invite is successful' do
+      it 'returns a Success object' do
+        response = successful_response
+        allow_successful_revoke_invite(response)
+
+        result = service.process_revoke_invite(email)
+
+        expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
+        expect(result.status_code).to eq(200)
+        expect(result.data).to eq(response)
+      end
+    end
+
+    context 'when revoke invite fails' do
+      it 'raises a custom error' do
+        allow_failed_revoke_invite
+
+        expect do
+          service.process_revoke_invite(email)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
+                           'Stytch Error (Status Code: 400) - Code: revoke_error - Message: Revoke invite error')
+      end
+    end
+  end
+
   describe '#process_authenticate' do
     context 'when authentication is successful' do
       it 'returns a Success object' do
@@ -138,6 +164,25 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService 
       }
     }
     allow(magic_links_email).to receive(:invite)
+      .with(email: email)
+      .and_return(response)
+  end
+
+  def allow_successful_revoke_invite(response)
+    allow(magic_links_email).to receive(:revoke_invite)
+      .with(email: email)
+      .and_return(response)
+  end
+
+  def allow_failed_revoke_invite
+    response = {
+      http_status_code: 400,
+      stytch_api_error: {
+        error_type: 'revoke_error',
+        error_message: 'Revoke invite error'
+      }
+    }
+    allow(magic_links_email).to receive(:revoke_invite)
       .with(email: email)
       .and_return(response)
   end
