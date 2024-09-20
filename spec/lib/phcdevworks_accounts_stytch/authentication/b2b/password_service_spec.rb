@@ -14,6 +14,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
   let(:password_reset_token) { 'reset_token' }
   let(:new_password) { 'new_secure_password' }
   let(:old_password) { 'old_secure_password' }
+  let(:password) { 'secure_password' }
   let(:service) { described_class.new }
 
   before do
@@ -127,13 +128,36 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
     end
   end
 
+  describe '#authenticate_password' do
+    context 'when authentication is successful' do
+      it 'returns a Success object' do
+        response = successful_response
+        allow_successful_authenticate(response)
+
+        result = service.authenticate_password(email, password, organization_id)
+
+        expect(result).to be_a(PhcdevworksAccountsStytch::Stytch::Success)
+        expect(result.status_code).to eq(200)
+        expect(result.data).to eq(response)
+      end
+    end
+
+    context 'when authentication fails' do
+      it 'raises a custom error' do
+        allow_failed_authenticate
+
+        expect do
+          service.authenticate_password(email, password, organization_id)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error,
+                           'Stytch Error (Status Code: 401) - Code: authentication_error - Message: Authentication failed')
+      end
+    end
+  end
+
   private
 
   def successful_response
-    {
-      http_status_code: 200,
-      user_id: 'user_123'
-    }
+    { http_status_code: 200, user_id: 'user_123', session_token: 'session_123' }
   end
 
   def allow_successful_reset_start(response)
@@ -143,13 +167,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
   end
 
   def allow_failed_reset_start
-    response = {
-      http_status_code: 400,
-      stytch_api_error: {
-        error_type: 'some_error_code',
-        error_message: 'Reset start error'
-      }
-    }
+    response = { http_status_code: 400, stytch_api_error: { error_type: 'some_error_code', error_message: 'Reset start error' } }
     allow(passwords_email).to receive(:reset_start)
       .with(organization_id: organization_id, email_address: email)
       .and_return(response)
@@ -162,13 +180,7 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
   end
 
   def allow_failed_reset
-    response = {
-      http_status_code: 400,
-      stytch_api_error: {
-        error_type: 'reset_error',
-        error_message: 'Reset error'
-      }
-    }
+    response = { http_status_code: 400, stytch_api_error: { error_type: 'reset_error', error_message: 'Reset error' } }
     allow(passwords_email).to receive(:reset)
       .with(password_reset_token: password_reset_token, password: new_password)
       .and_return(response)
@@ -181,13 +193,8 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
   end
 
   def allow_failed_reset_existing
-    response = {
-      http_status_code: 400,
-      stytch_api_error: {
-        error_type: 'existing_reset_error',
-        error_message: 'Existing reset error'
-      }
-    }
+    response = { http_status_code: 400,
+                 stytch_api_error: { error_type: 'existing_reset_error', error_message: 'Existing reset error' } }
     allow(passwords_existing).to receive(:reset)
       .with(email_address: email, existing_password: old_password, new_password: new_password, organization_id: organization_id)
       .and_return(response)
@@ -200,15 +207,24 @@ RSpec.describe PhcdevworksAccountsStytch::Authentication::B2b::PasswordService d
   end
 
   def allow_failed_reset_with_session
-    response = {
-      http_status_code: 400,
-      stytch_api_error: {
-        error_type: 'session_reset_error',
-        error_message: 'Session reset error'
-      }
-    }
+    response = { http_status_code: 400,
+                 stytch_api_error: { error_type: 'session_reset_error', error_message: 'Session reset error' } }
     allow(passwords_sessions).to receive(:reset)
       .with(session_token: session_token, password: new_password, organization_id: organization_id)
+      .and_return(response)
+  end
+
+  def allow_successful_authenticate(response)
+    allow(passwords).to receive(:authenticate)
+      .with(email_address: email, password: password, organization_id: organization_id)
+      .and_return(response)
+  end
+
+  def allow_failed_authenticate
+    response = { http_status_code: 401,
+                 stytch_api_error: { error_type: 'authentication_error', error_message: 'Authentication failed' } }
+    allow(passwords).to receive(:authenticate)
+      .with(email_address: email, password: password, organization_id: organization_id)
       .and_return(response)
   end
 end
