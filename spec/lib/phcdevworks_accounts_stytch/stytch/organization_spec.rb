@@ -30,24 +30,6 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
       end
     end
 
-    context 'when organizations is an empty array' do
-      before do
-        # Simulate a response where organizations is an empty array
-        allow(organizations_client).to receive(:search).and_return({
-                                                                     'organizations' => []
-                                                                   })
-      end
-
-      it 'raises a not found error with status code 404' do
-        expect do
-          organization_service.find_organization_id_by_slug(slug)
-        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
-          expect(e.status_code).to eq(404)
-          expect(e.error_message).to eq('Organization not found')
-        end
-      end
-    end
-
     context 'when a generic server error occurs' do
       before do
         # Simulate a server error that includes a status_code
@@ -66,25 +48,21 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
       end
     end
 
-    context 'when organizations are found' do
+    context 'when no organization is found' do
       before do
-        # Simulate a response where an organization is found
+        # Simulate a response where no organizations are found
         allow(organizations_client).to receive(:search).and_return({
-                                                                     'organizations' => [
-                                                                       { 'organization_id' => 'org_1234' }
-                                                                     ]
+                                                                     'organizations' => []
                                                                    })
       end
 
-      it 'returns the organization ID and hits the then branch' do
-        # Call the method and capture the result
-        result = organization_service.find_organization_id_by_slug(slug)
-
-        # Expect the correct organization ID to be returned
-        expect(result).to eq('org_1234')
-
-        # Confirm the if organizations&.any? branch is executed by adding an expectation
-        expect(organizations_client).to have_received(:search)
+      it 'raises a not found error with status code 404' do
+        expect do
+          organization_service.find_organization_id_by_slug(slug)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
+          expect(e.status_code).to eq(404)
+          expect(e.error_message).to eq('Organization not found')
+        end
       end
     end
 

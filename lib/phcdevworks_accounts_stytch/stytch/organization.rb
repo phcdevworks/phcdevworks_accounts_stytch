@@ -31,8 +31,9 @@ module PhcdevworksAccountsStytch
 
       def extract_organization_id(response, slug)
         organizations = response['organizations']
-        if organizations&.any?
-          organization = organizations.first
+        organization = organizations.first
+
+        if organization
           organization['organization_id']
         else
           raise PhcdevworksAccountsStytch::Stytch::Error.new(
