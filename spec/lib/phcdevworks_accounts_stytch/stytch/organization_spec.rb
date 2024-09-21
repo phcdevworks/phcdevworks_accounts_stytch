@@ -14,14 +14,31 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
   end
 
   describe '#find_organization_id_by_slug' do
-    context 'when the organization is not found' do
+    context 'when an organization is found' do
       before do
+        # Simulate a response where an organization is found
         allow(organizations_client).to receive(:search).and_return({
-                                                                     'organizations' => [] # Simulate no organizations found
+                                                                     'organizations' => [
+                                                                       { 'organization_id' => 'org_1234' }
+                                                                     ]
                                                                    })
       end
 
-      it 'raises a not found error with the new message' do
+      it 'returns the organization ID' do
+        result = organization_service.find_organization_id_by_slug(slug)
+        expect(result).to eq('org_1234')
+      end
+    end
+
+    context 'when organizations is an empty array' do
+      before do
+        # Simulate a response where organizations is an empty array
+        allow(organizations_client).to receive(:search).and_return({
+                                                                     'organizations' => []
+                                                                   })
+      end
+
+      it 'raises a not found error with status code 404' do
         expect do
           organization_service.find_organization_id_by_slug(slug)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
@@ -31,8 +48,49 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
       end
     end
 
+    context 'when a generic server error occurs' do
+      before do
+        # Simulate a server error that includes a status_code
+        allow(organizations_client).to receive(:search).and_raise(
+          PhcdevworksAccountsStytch::Stytch::ServerError.new('Unexpected server error')
+        )
+      end
+
+      it 'raises a server error with a status code of 500' do
+        expect do
+          organization_service.find_organization_id_by_slug(slug)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
+          expect(e.status_code).to eq(500)
+          expect(e.error_message).to eq('Unexpected server error')
+        end
+      end
+    end
+
+    context 'when organizations are found' do
+      before do
+        # Simulate a response where an organization is found
+        allow(organizations_client).to receive(:search).and_return({
+                                                                     'organizations' => [
+                                                                       { 'organization_id' => 'org_1234' }
+                                                                     ]
+                                                                   })
+      end
+
+      it 'returns the organization ID and hits the then branch' do
+        # Call the method and capture the result
+        result = organization_service.find_organization_id_by_slug(slug)
+
+        # Expect the correct organization ID to be returned
+        expect(result).to eq('org_1234')
+
+        # Confirm the if organizations&.any? branch is executed by adding an expectation
+        expect(organizations_client).to have_received(:search)
+      end
+    end
+
     context 'when a forbidden access error occurs' do
       before do
+        # Simulate a 403 forbidden error
         allow(organizations_client).to receive(:search).and_raise(
           PhcdevworksAccountsStytch::Stytch::Error.new(
             status_code: 403,
@@ -41,12 +99,30 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
         )
       end
 
-      it 'raises a forbidden access error with the correct message' do
+      it 'raises a forbidden access error with status code 403' do
         expect do
           organization_service.find_organization_id_by_slug(slug)
         end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
           expect(e.status_code).to eq(403)
           expect(e.error_message).to eq('Forbidden access')
+        end
+      end
+    end
+
+    context 'when an unknown error occurs' do
+      before do
+        # Simulate a generic error without a status_code
+        allow(organizations_client).to receive(:search).and_raise(
+          PhcdevworksAccountsStytch::Stytch::ServerError.new('Unexpected error', 500)
+        )
+      end
+
+      it 'raises a server error with status code 500' do
+        expect do
+          organization_service.find_organization_id_by_slug(slug)
+        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
+          expect(e.status_code).to eq(500)
+          expect(e.error_message).to eq('Unexpected error')
         end
       end
     end
@@ -75,6 +151,26 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
 
       # Directly test the query method without involving the error handling
       organization_service.send(:search_organization_by_slug, slug)
+    end
+
+    describe '#find_organization_id_by_slug' do
+      context 'when a generic error without status_code is raised' do
+        before do
+          # Simulate a generic StandardError that does not have a status_code
+          allow(organizations_client).to receive(:search).and_raise(
+            StandardError.new('Unexpected server error')
+          )
+        end
+
+        it 'raises a server error with a status code of 500' do
+          expect do
+            organization_service.find_organization_id_by_slug(slug)
+          end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
+            expect(e.status_code).to eq(500)
+            expect(e.error_message).to eq('Unexpected server error')
+          end
+        end
+      end
     end
   end
 end

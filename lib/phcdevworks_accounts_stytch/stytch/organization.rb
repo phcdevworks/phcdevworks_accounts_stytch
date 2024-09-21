@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'server_error'
+
 module PhcdevworksAccountsStytch
   module Stytch
     class Organization
@@ -41,6 +43,8 @@ module PhcdevworksAccountsStytch
       end
 
       def handle_error(error)
+        error = CustomServerError.new(error.message) unless error.respond_to?(:status_code)
+
         case error.status_code
         when 404
           raise PhcdevworksAccountsStytch::Stytch::Error.new(
@@ -54,10 +58,19 @@ module PhcdevworksAccountsStytch
           )
         else
           raise PhcdevworksAccountsStytch::Stytch::Error.new(
-            status_code: error.respond_to?(:status_code) ? error.status_code : 500,
+            status_code: error.status_code || 500,
             error_message: error.message
           )
         end
+      end
+    end
+
+    class CustomServerError < StandardError
+      attr_reader :status_code
+
+      def initialize(message = 'Unexpected server error', status_code = 500)
+        super(message)
+        @status_code = status_code
       end
     end
   end
