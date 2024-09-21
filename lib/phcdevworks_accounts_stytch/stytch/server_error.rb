@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PhcdevworksAccountsStytch
   module Stytch
     class ServerError < StandardError

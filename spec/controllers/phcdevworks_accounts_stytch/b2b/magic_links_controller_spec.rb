@@ -16,9 +16,23 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
     allow(PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService).to receive(:new).and_return(service)
     allow(PhcdevworksAccountsStytch::Stytch::Organization).to receive(:new).and_return(organization_service)
     allow(organization_service).to receive(:find_organization_id_by_slug).with(organization_slug).and_return(organization_id)
+    # Stub organization service to handle empty organization_slug as well
+    allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
   end
 
   describe 'POST #process_login_or_signup' do
+    context 'when required params are missing' do
+      before do
+        # Simulate the case where both email and organization_slug are missing
+        post :process_login_or_signup, params: { email: '', organization_slug: '' }
+      end
+
+      it 'returns an error when email and organization_slug are missing' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to include('error' => 'Email and Organization Slug are required.')
+      end
+    end
+
     context 'when login or signup is successful' do
       let(:success_response) do
         instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',

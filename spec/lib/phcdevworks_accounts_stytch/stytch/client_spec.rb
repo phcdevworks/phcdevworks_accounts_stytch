@@ -14,7 +14,6 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Client do
     allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :project_id).and_return(b2c_project_id)
     allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :secret).and_return(b2c_secret)
 
-    # Clear memoized instance variables before each test
     described_class.instance_variable_set(:@b2b_client, nil)
     described_class.instance_variable_set(:@b2c_client, nil)
   end

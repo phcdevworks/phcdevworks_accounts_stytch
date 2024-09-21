@@ -168,4 +168,56 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
       end
     end
   end
+
+  describe 'POST #process_reset_start' do
+    context 'when missing required params' do
+      before do
+        # Stub organization_service to handle empty organization_slug
+        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
+
+        # Simulate a post request with missing email and organization_slug
+        post :process_reset_start, params: { email: '', organization_slug: '' }
+      end
+
+      it 'returns an error when email and organization_slug are missing' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Email and Organization Slug are required.')
+      end
+    end
+
+    context 'when reset start is successful' do
+      let(:success_response) do
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
+      end
+
+      before do
+        allow(service).to receive(:reset_start).with(email, organization_id).and_return(success_response)
+        post :process_reset_start, params: { email: email, organization_slug: organization_slug }
+      end
+
+      it 'calls the reset_start service' do
+        expect(service).to have_received(:reset_start).with(email, organization_id)
+      end
+
+      it 'returns a success response' do
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['message']).to eq('Action completed successfully')
+      end
+    end
+
+    context 'when reset start fails' do
+      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Reset start error') }
+
+      before do
+        allow(service).to receive(:reset_start).with(email, organization_id).and_raise(error)
+        post :process_reset_start, params: { email: email, organization_slug: organization_slug }
+      end
+
+      it 'returns an error response' do
+        expect(response).to have_http_status(:bad_request)
+        expect(JSON.parse(response.body)['error']).to eq('Stytch Error (Status Code: 400) - Message: Reset start error')
+      end
+    end
+  end
 end
