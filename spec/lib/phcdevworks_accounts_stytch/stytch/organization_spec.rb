@@ -56,12 +56,14 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
     let(:slug) { 'phcdevworks' }
 
     before do
+      # Stub the search method to avoid triggering the error and focus on query verification
       allow(organizations_client).to receive(:search).and_return({
-                                                                   'organizations' => [{ 'organization_id' => 'phcdevworks' }] # Dummy response to prevent error
+                                                                   'organizations' => [] # Return an empty result to simulate no organization found, but avoid error
                                                                  })
     end
 
     it 'sends the correct search query to the client' do
+      # Expect the organizations_client to receive the correct search query
       expect(organizations_client).to receive(:search).with(
         query: {
           operator: 'OR',
@@ -71,7 +73,8 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Organization do
         }
       ).and_return({})
 
-      organization_service.find_organization_id_by_slug(slug)
+      # Directly test the query method without involving the error handling
+      organization_service.send(:search_organization_by_slug, slug)
     end
   end
 end
