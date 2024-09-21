@@ -41,10 +41,23 @@ module PhcdevworksAccountsStytch
       end
 
       def handle_error(error)
-        raise PhcdevworksAccountsStytch::Stytch::Error.new(
-          status_code: error.respond_to?(:status_code) ? error.status_code : 500,
-          error_message: error.message
-        )
+        case error.status_code
+        when 404
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: 404,
+            error_message: 'Organization not found'
+          )
+        when 403
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: 403,
+            error_message: 'Forbidden access'
+          )
+        else
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: error.respond_to?(:status_code) ? error.status_code : 500,
+            error_message: error.message
+          )
+        end
       end
     end
   end
