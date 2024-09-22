@@ -35,7 +35,8 @@ jobs:
       run: |
         echo "${{ secrets.PHCDEV_TEST_KEY }}" > spec/dummy/config/master.key
         mkdir -p tmp
-        bundle exec rspec --format json --out tmp/rspec_results.json
+        # Start SimpleCov before running tests
+        bundle exec rspec --require simplecov --format json --out tmp/rspec_results.json
 
     # Step 5: Upload RSpec test results (test analytics)
     - name: Upload RSpec test results
@@ -48,5 +49,12 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        files: coverage/.resultset.json
+        file: coverage/.resultset.json
         token: ${{ secrets.CODECOV_TOKEN }}
+
+    # Step 7: Upload coverage report artifact (optional for debugging)
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage/
