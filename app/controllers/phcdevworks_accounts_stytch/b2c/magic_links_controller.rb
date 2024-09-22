@@ -39,7 +39,11 @@ module PhcdevworksAccountsStytch
 
         handle_service_action(:revoke_invite) do
           result = service.process_revoke_invite(params[:email])
-          Rails.logger.info("Revoke invite successful: #{result.data}")
+          if result.is_a?(Hash) && result.key?(:data)
+            Rails.logger.info("Revoke invite successful: #{result[:data]}")
+          else
+            Rails.logger.info("Revoke invite successful: #{result.data}")
+          end
           result
         end
       end

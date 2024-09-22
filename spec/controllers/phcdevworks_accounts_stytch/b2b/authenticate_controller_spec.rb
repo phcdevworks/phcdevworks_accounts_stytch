@@ -17,6 +17,55 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
     allow(PhcdevworksAccountsStytch::Authentication::B2b::PasswordService).to receive(:new).and_return(password_service)
   end
 
+  describe 'POST #authenticate' do
+    context 'when magic link token is present' do
+      before do
+        post :authenticate, params: { token: magic_links_token }
+      end
+
+      it 'redirects to magic link authentication path' do
+        expect(response).to redirect_to(b2b_process_authenticate_path(token: magic_links_token))
+      end
+    end
+
+    context 'when email, password, and organization ID are present' do
+      before do
+        post :authenticate, params: { email: email, password: password, organization_id: organization_id }
+      end
+
+      it 'redirects to password authentication path' do
+        expect(response).to redirect_to(
+          b2b_process_authenticate_path(email: email, password: password, organization_id: organization_id)
+        )
+      end
+    end
+
+    context 'when credentials are missing' do
+      before do
+        post :authenticate, params: {}
+      end
+
+      it 'handles missing credentials' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body))
+          .to include('error' => 'Magic link token or email, password, and organization ID are required.')
+      end
+    end
+
+    context 'when an unexpected error occurs' do
+      before do
+        # Simulate an unexpected error
+        allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
+        post :authenticate, params: { token: magic_links_token }
+      end
+
+      it 'handles unexpected errors' do
+        expect(response).to have_http_status(:internal_server_error)
+        expect(JSON.parse(response.body)).to include('error' => 'An unexpected error occurred.')
+      end
+    end
+  end
+
   describe 'POST #process_authenticate' do
     context 'when authenticating with a magic link token' do
       let(:success_response) do
