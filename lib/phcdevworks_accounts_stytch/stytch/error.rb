@@ -8,7 +8,7 @@ module PhcdevworksAccountsStytch
       def initialize(status_code: nil, error_code: nil, error_message: nil)
         @status_code = status_code
         @error_code = error_code
-        @error_message = error_message || 'An error occurred with Stytch'
+        @error_message = error_message unless error_message.nil?
         super(build_message)
       end
 
