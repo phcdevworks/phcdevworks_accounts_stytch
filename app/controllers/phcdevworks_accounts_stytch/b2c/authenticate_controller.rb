@@ -3,6 +3,9 @@
 module PhcdevworksAccountsStytch
   module B2c
     class AuthenticateController < ApplicationController
+      include ErrorHandler
+      include HandleServiceAction
+
       def authenticate
         if magic_link_token_present?
           handle_magic_link_authentication
@@ -11,6 +14,8 @@ module PhcdevworksAccountsStytch
         else
           handle_missing_credentials
         end
+      rescue PhcdevworksAccountsStytch::Stytch::ServerError => e
+        handle_server_error(e)
       rescue StandardError => e
         handle_unexpected_error(e)
       end
@@ -23,6 +28,8 @@ module PhcdevworksAccountsStytch
         else
           handle_missing_credentials
         end
+      rescue PhcdevworksAccountsStytch::Stytch::ServerError => e
+        handle_server_error(e)
       rescue StandardError => e
         handle_unexpected_error(e)
       end
@@ -75,23 +82,13 @@ module PhcdevworksAccountsStytch
         PhcdevworksAccountsStytch::Authentication::B2c::PasswordService.new
       end
 
-      def log_error(message)
-        Rails.logger.error(message)
+      def handle_server_error(e)
+        log_error("Server error occurred: #{e.message}")
+        render json: { error: e.message }, status: e.status_code
       end
 
-      def handle_unexpected_error(exception)
-        log_error("Unexpected error during authentication: #{exception.message}")
-        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
-      end
-
-      def handle_service_action(action_name)
-        result = yield
-        render json: { message: result.message, data: result.data }, status: :ok
-      rescue PhcdevworksAccountsStytch::Stytch::Error => e
-        log_error("Stytch API error during #{action_name}: #{e.message}")
-        render json: { error: e.message }, status: :bad_request
-      rescue StandardError => e
-        log_error("Unexpected error during #{action_name}: #{e.message}")
+      def handle_unexpected_error(e)
+        log_error("Unexpected error occurred: #{e.message}")
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
     end

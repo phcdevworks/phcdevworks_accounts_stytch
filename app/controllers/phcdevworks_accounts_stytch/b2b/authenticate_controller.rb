@@ -14,6 +14,8 @@ module PhcdevworksAccountsStytch
         else
           handle_missing_credentials
         end
+      rescue PhcdevworksAccountsStytch::Stytch::ServerError => e
+        handle_server_error(e)
       rescue StandardError => e
         handle_unexpected_error(e)
       end
@@ -26,6 +28,8 @@ module PhcdevworksAccountsStytch
         else
           handle_missing_credentials
         end
+      rescue PhcdevworksAccountsStytch::Stytch::ServerError => e
+        handle_server_error(e)
       rescue StandardError => e
         handle_unexpected_error(e)
       end
@@ -75,6 +79,16 @@ module PhcdevworksAccountsStytch
 
       def password_service
         PhcdevworksAccountsStytch::Authentication::B2b::PasswordService.new
+      end
+
+      def handle_server_error(e)
+        log_error("Server error occurred: #{e.message}")
+        render json: { error: e.message }, status: e.status_code
+      end
+
+      def handle_unexpected_error(e)
+        log_error("Unexpected error occurred: #{e.message}")
+        render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
     end
   end

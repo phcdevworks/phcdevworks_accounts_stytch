@@ -52,14 +52,29 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
-    context 'when an unexpected error occurs' do
+    context 'when a ServerError occurs' do
       before do
-        # Simulate an unexpected error
-        allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
+        allow(controller).to receive(:magic_link_token_present?).and_raise(
+          PhcdevworksAccountsStytch::Stytch::ServerError.new('Server error occurred', 503)
+        )
         post :authenticate, params: { token: magic_links_token }
       end
 
-      it 'handles unexpected errors' do
+      it 'handles the server error and calls handle_server_error' do
+        expect(response).to have_http_status(:service_unavailable) # 503
+        expect(JSON.parse(response.body)).to include('error' => 'Server error occurred')
+      end
+    end
+
+    context 'when an unexpected error occurs in authenticate' do
+      before do
+        # Simulate an unexpected StandardError to trigger handle_unexpected_error
+        allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
+
+        post :authenticate, params: { token: magic_links_token }
+      end
+
+      it 'handles the unexpected error with handle_unexpected_error' do
         expect(response).to have_http_status(:internal_server_error)
         expect(JSON.parse(response.body)).to include('error' => 'An unexpected error occurred.')
       end
@@ -102,6 +117,20 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body))
           .to include('error' => 'Stytch Error (Status Code: 400) - Message: Authentication error')
+      end
+    end
+
+    context 'when a ServerError occurs during magic link authentication' do
+      before do
+        allow(magic_link_service).to receive(:process_authenticate).with(magic_links_token).and_raise(
+          PhcdevworksAccountsStytch::Stytch::ServerError.new('Server error occurred', 503)
+        )
+        post :process_authenticate, params: { token: magic_links_token }
+      end
+
+      it 'handles the server error and returns the correct status and message' do
+        expect(response).to have_http_status(:service_unavailable) # 503
+        expect(JSON.parse(response.body)).to include('error' => 'Server error occurred')
       end
     end
 
@@ -154,6 +183,19 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body))
           .to include('error' => 'Magic link token or email, password, and organization ID are required.')
+      end
+    end
+
+    context 'when an unexpected error occurs in process_authenticate' do
+      before do
+        allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
+
+        post :process_authenticate, params: { token: magic_links_token }
+      end
+
+      it 'handles the unexpected error with handle_unexpected_error' do
+        expect(response).to have_http_status(:internal_server_error)
+        expect(JSON.parse(response.body)).to include('error' => 'An unexpected error occurred.')
       end
     end
   end
