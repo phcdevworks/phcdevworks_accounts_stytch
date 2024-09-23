@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe HandleServiceAction, type: :controller do
   controller(ApplicationController) do
+    # rubocop:disable RSpec/DescribedClass
     include HandleServiceAction
+    # rubocop:enable RSpec/DescribedClass
 
     def log_error(message)
       Rails.logger.error(message)

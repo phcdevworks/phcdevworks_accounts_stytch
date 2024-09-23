@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe ErrorHandler, type: :controller do
   controller(ApplicationController) do
+    # rubocop:disable RSpec/DescribedClass
     include ErrorHandler
+    # rubocop:enable RSpec/DescribedClass
 
     def test_unexpected_error
       raise StandardError, 'Something went wrong'
@@ -30,10 +32,11 @@ RSpec.describe ErrorHandler, type: :controller do
 
   describe '#handle_unexpected_error' do
     it 'logs the error and returns a 500 status with a generic error message' do
-      expect(Rails.logger).to receive(:error).with('Unexpected error: Something went wrong')
+      allow(Rails.logger).to receive(:error)
 
       get :test_unexpected_error
 
+      expect(Rails.logger).to have_received(:error).with('Unexpected error: Something went wrong')
       expect(response).to have_http_status(:internal_server_error)
       expect(JSON.parse(response.body)).to eq({ 'error' => 'An unexpected error occurred.' })
     end
@@ -41,10 +44,11 @@ RSpec.describe ErrorHandler, type: :controller do
 
   describe '#handle_missing_params_error' do
     it 'logs the error and returns a 422 status with a specific error message' do
-      expect(Rails.logger).to receive(:error).with('Email and password are required')
+      allow(Rails.logger).to receive(:error)
 
       get :test_missing_params_error
 
+      expect(Rails.logger).to have_received(:error).with('Email and password are required')
       expect(response).to have_http_status(:unprocessable_entity)
       expect(JSON.parse(response.body)).to eq({ 'error' => 'Email and password are required' })
     end

@@ -9,7 +9,12 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
   let(:email) { 'user@example.com' }
 
   before do
+    result = { data: { key: 'value' } }
+
     allow(PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService).to receive(:new).and_return(service)
+    allow(service).to receive(:process_revoke_invite).with('user@example.com').and_return(result)
+
+    post :process_revoke_invite, params: { email: 'user@example.com' }
   end
 
   describe 'POST #process_login_or_signup' do
@@ -141,7 +146,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when an unexpected error occurs' do
       before do
-        allow(service).to receive(:process_revoke_invite).with('user@example.com').and_raise(StandardError.new('Unexpected error'))
+        allow(service).to receive(:process_revoke_invite).with('user@example.com').and_raise(
+          StandardError.new('Unexpected error')
+        )
         post :process_revoke_invite, params: { email: 'user@example.com' }
       end
 
@@ -153,7 +160,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when result is not a hash with a message' do
       before do
-        result = double('Result', data: { key: 'value' })
+        # Return a response without a message to simulate the failure case
+        result = { data: { key: 'value' } }
         allow(service).to receive(:process_revoke_invite).with('user@example.com').and_return(result)
         post :process_revoke_invite, params: { email: 'user@example.com' }
       end
@@ -164,7 +172,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
       end
     end
 
-    context 'when result is a hash with message' do
+    context 'when result is a hash with a message' do
       before do
         result = { message: 'Revoke successful', data: { key: 'value' } }
         allow(service).to receive(:process_revoke_invite).with('user@example.com').and_return(result)

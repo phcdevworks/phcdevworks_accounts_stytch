@@ -82,13 +82,13 @@ module PhcdevworksAccountsStytch
         PhcdevworksAccountsStytch::Authentication::B2c::PasswordService.new
       end
 
-      def handle_server_error(e)
-        log_error("Server error occurred: #{e.message}")
-        render json: { error: e.message }, status: e.status_code
+      def handle_server_error(servererror)
+        log_error("Server error occurred: #{servererror.message}")
+        render json: { error: servererror.message }, status: servererror.status_code
       end
 
-      def handle_unexpected_error(e)
-        log_error("Unexpected error occurred: #{e.message}")
+      def handle_unexpected_error(unexpectederror)
+        log_error("Unexpected error occurred: #{unexpectederror.message}")
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
     end

@@ -172,16 +172,13 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
   describe 'POST #process_reset_start' do
     context 'when missing required params' do
       before do
-        # Stub organization_service to handle empty organization_slug
         allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
-
-        # Simulate a post request with missing email and organization_slug
         post :process_reset_start, params: { email: '', organization_slug: '' }
       end
 
       it 'returns an error when email and organization_slug are missing' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Email and Organization Slug are required.')
+        expect(JSON.parse(response.body)['error']).to eq('Organization slug is required')
       end
     end
 

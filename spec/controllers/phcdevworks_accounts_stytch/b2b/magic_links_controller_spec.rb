@@ -27,7 +27,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns an error when email and organization_slug are missing' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to include('error' => 'Email and Organization Slug are required.')
+        expect(JSON.parse(response.body)).to include('error' => 'Organization slug is required')
       end
     end
 

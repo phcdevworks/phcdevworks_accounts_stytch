@@ -80,45 +80,57 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::Response do
 
     context 'when the response is an error' do
       it 'raises an error for a 400 status code with known error' do
-        expect do
+        error = nil
+        begin
           described_class.handle_response(error_response)
-        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
-          expect(e.status_code).to eq(400)
-          expect(e.error_code).to eq('invalid_request')
-          expect(e.error_message).to eq('The request was invalid')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          error = e
         end
+
+        expect(error.status_code).to eq(400)
+        expect(error.error_code).to eq('invalid_request')
+        expect(error.error_message).to eq('The request was invalid')
       end
 
       it 'raises an error for a 500 status code with unknown error' do
-        expect do
+        error = nil
+        begin
           described_class.handle_response(unknown_error_response)
-        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
-          expect(e.status_code).to eq(500)
-          expect(e.error_code).to eq('unknown_error')
-          expect(e.error_message).to eq('An unknown error occurred')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          error = e
         end
+
+        expect(error.status_code).to eq(500)
+        expect(error.error_code).to eq('unknown_error')
+        expect(error.error_message).to eq('An unknown error occurred')
       end
 
       it 'raises an error for a 500 status code with known error' do
-        expect do
+        error = nil
+        begin
           described_class.handle_response(internal_server_error_response)
-        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
-          expect(e.status_code).to eq(500)
-          expect(e.error_code).to eq('server_error')
-          expect(e.error_message).to eq('Internal server error')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          error = e
         end
+
+        expect(error.status_code).to eq(500)
+        expect(error.error_code).to eq('server_error')
+        expect(error.error_message).to eq('Internal server error')
       end
     end
 
     context 'when the response is missing http_status_code' do
       it 'defaults to 500 if status code is missing' do
-        expect do
+        error = nil
+        begin
           described_class.handle_response(incomplete_response)
-        end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error) do |e|
-          expect(e.status_code).to eq(500)
-          expect(e.error_code).to eq('unknown_error')
-          expect(e.error_message).to eq('An unknown error occurred')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          error = e
         end
+
+        expect(error.status_code).to eq(500)
+        expect(error.error_code).to eq('unknown_error')
+        expect(error.error_message).to eq('An unknown error occurred')
       end
     end
 
