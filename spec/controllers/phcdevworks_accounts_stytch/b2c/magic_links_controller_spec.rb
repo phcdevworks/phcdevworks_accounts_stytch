@@ -31,8 +31,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when login or signup is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
@@ -75,8 +76,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
 
     context 'when invite is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do

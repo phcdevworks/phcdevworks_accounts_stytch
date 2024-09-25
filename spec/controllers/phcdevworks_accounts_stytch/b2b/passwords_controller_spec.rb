@@ -33,8 +33,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
@@ -82,8 +83,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset existing is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
@@ -133,8 +135,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset with session is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
@@ -184,8 +187,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset start is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do

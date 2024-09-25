@@ -31,10 +31,22 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
       end
     end
 
+    context 'when only organization_slug is missing' do
+      before do
+        post :process_login_or_signup, params: { email: email, organization_slug: '' }
+      end
+
+      it 'returns an error when organization_slug is missing' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to include('error' => 'Organization slug is required')
+      end
+    end
+
     context 'when login or signup is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
@@ -64,7 +76,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
   end
 
   describe 'POST #process_invite' do
-    context 'when email or organization slug is missing' do
+    context 'when email or organization_slug is missing' do
       before do
         post :process_invite, params: { email: '', organization_slug: 'example-org' }
       end
@@ -77,8 +89,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
     context 'when invite is successful' do
       let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
+        instance_double(
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+        )
       end
 
       before do
