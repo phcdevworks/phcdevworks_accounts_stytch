@@ -27,7 +27,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns an error when email and organization_slug are missing' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to include('error' => 'Organization slug is required')
+        expect(JSON.parse(response.body)).to include(
+          'error' => 'Organization slug is required'
+        )
       end
     end
 
@@ -38,7 +40,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns an error when organization_slug is missing' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)).to include('error' => 'Organization slug is required')
+        expect(JSON.parse(response.body)).to include(
+          'error' => 'Organization slug is required'
+        )
       end
     end
 
@@ -56,7 +60,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('message' => 'Action completed successfully')
+        expect(JSON.parse(response.body)).to include(
+          'message' => 'Action completed successfully'
+        )
       end
     end
 
@@ -70,7 +76,25 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Login error')
+        expect(JSON.parse(response.body)).to include(
+          'error' => 'Stytch Error (Status Code: 400) - Message: Login error'
+        )
+      end
+
+      context 'when email format is invalid' do
+        let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 422, error_message: 'Invalid email format.') }
+
+        before do
+          allow(service).to receive(:process_login_or_signup).with('invalid-email', organization_id).and_raise(error)
+          post :process_login_or_signup, params: { email: 'invalid-email', organization_slug: organization_slug }
+        end
+
+        it 'returns an error response for invalid email format' do
+          expect(response).to have_http_status(:bad_request)
+          expect(JSON.parse(response.body)).to include(
+            'error' => 'Stytch Error (Status Code: 422) - Message: Invalid email format.'
+          )
+        end
       end
     end
   end
