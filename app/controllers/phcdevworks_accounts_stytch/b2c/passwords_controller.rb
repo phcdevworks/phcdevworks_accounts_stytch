@@ -4,9 +4,7 @@ module PhcdevworksAccountsStytch
   module B2c
     class PasswordsController < ApplicationController
       include ErrorHandler
-      include HandleServiceAction # Removed OrganizationSetter
-
-      # Removed before_action :set_organization
+      include HandleServiceAction
 
       def reset_start; end
 
@@ -17,7 +15,7 @@ module PhcdevworksAccountsStytch
         end
 
         handle_service_action(:reset_start) do
-          result = service.reset_start(params[:email]) # Removed @organization_id
+          result = service.reset_start(params[:email])
           Rails.logger.info("Password Reset Start successful: #{result.data}")
           result
         end
@@ -47,7 +45,7 @@ module PhcdevworksAccountsStytch
         end
 
         handle_service_action(:reset_existing_password) do
-          result = service.reset_existing(params[:email], params[:old_password], params[:new_password]) # Removed @organization_id
+          result = service.reset_existing(params[:email], params[:old_password], params[:new_password])
           Rails.logger.info("Existing Password Reset Successful: #{result.data}")
           result
         end
@@ -62,7 +60,7 @@ module PhcdevworksAccountsStytch
         end
 
         handle_service_action(:reset_with_session) do
-          result = service.reset_with_session(params[:session_token], params[:password]) # Removed @organization_id
+          result = service.reset_with_session(params[:session_token], params[:password])
           Rails.logger.info("Session-based Password Reset Successful: #{result.data}")
           result
         end

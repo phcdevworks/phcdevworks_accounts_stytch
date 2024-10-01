@@ -7,7 +7,9 @@ module PhcdevworksAccountsStytch
       include OrganizationSetter
       include HandleServiceAction
 
-      before_action :set_organization, only: %i[process_reset_start process_reset_existing_password process_reset_with_session]
+      before_action :set_organization, only: %i[
+        process_reset_start process_reset_existing_password process_reset_with_session
+      ]
 
       def reset_start; end
 

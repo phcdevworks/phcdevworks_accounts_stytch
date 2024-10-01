@@ -45,12 +45,16 @@ module PhcdevworksAccountsStytch
       end
 
       def handle_magic_link_authentication
-        redirect_to b2b_process_authenticate_path(token: params[:token])
+        redirect_to b2b_process_authenticate_path(
+          token: params[:token]
+        )
       end
 
       def handle_password_authentication
-        redirect_to b2b_process_authenticate_path(email: params[:email], password: params[:password],
-                                                  organization_id: params[:organization_id])
+        redirect_to b2b_process_authenticate_path(
+          email: params[:email], password: params[:password],
+          organization_id: params[:organization_id]
+        )
       end
 
       def handle_missing_credentials
