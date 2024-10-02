@@ -5,6 +5,7 @@ module PhcdevworksAccountsStytch
     class Error < StandardError
       attr_reader :status_code, :error_code, :error_message
 
+      # Initialize the error
       def initialize(status_code: nil, error_code: nil, error_message: nil)
         @status_code = status_code
         @error_code = error_code
@@ -14,6 +15,7 @@ module PhcdevworksAccountsStytch
 
       private
 
+      # Build the error message
       def build_message
         message = 'Stytch Error'
         message += " (Status Code: #{@status_code})" if @status_code

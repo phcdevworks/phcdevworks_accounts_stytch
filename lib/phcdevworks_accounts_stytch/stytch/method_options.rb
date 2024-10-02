@@ -5,10 +5,12 @@ module PhcdevworksAccountsStytch
     class MethodOptions
       attr_reader :options
 
+      # Initialize the method options
       def initialize(options = {})
         @options = options
       end
 
+      # Convert the options to headers
       def to_headers
         headers = {}
         if (authorization = options[:authorization]) && authorization[:session_token]
