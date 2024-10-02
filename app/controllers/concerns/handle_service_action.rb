@@ -3,6 +3,7 @@
 module HandleServiceAction
   extend ActiveSupport::Concern
 
+  # Handle service action in the controllers
   def handle_service_action(action_name)
     result = yield
     if result.is_a?(Hash) && result.key?(:message)

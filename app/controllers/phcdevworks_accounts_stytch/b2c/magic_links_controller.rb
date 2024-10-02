@@ -3,8 +3,10 @@
 module PhcdevworksAccountsStytch
   module B2c
     class MagicLinksController < ApplicationController
+      # Login or signup with magic link
       def login_or_signup; end
 
+      # Process login or signup with magic link
       def process_login_or_signup
         if params[:email].blank?
           handle_missing_params_error
@@ -18,8 +20,10 @@ module PhcdevworksAccountsStytch
         end
       end
 
+      # Invite with magic link
       def invite; end
 
+      # Process invite with magic link
       def process_invite
         if missing_required_params?
           handle_missing_params_error
@@ -33,6 +37,7 @@ module PhcdevworksAccountsStytch
         end
       end
 
+      # Revoke invite with magic link
       def process_revoke_invite
         if missing_required_params?
           handle_missing_params_error
@@ -48,6 +53,7 @@ module PhcdevworksAccountsStytch
 
       private
 
+      # Handle service action
       def handle_service_action(action_name)
         result = yield
         render json: { message: result[:message], data: result[:data] }, status: :ok
@@ -59,19 +65,23 @@ module PhcdevworksAccountsStytch
         render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
       end
 
+      # Handle missing parameters error
       def handle_missing_params_error
         log_error('Missing email')
         render json: { error: 'Email is required.' }, status: :unprocessable_entity
       end
 
+      # Check if required parameters are missing
       def missing_required_params?
         params[:email].blank?
       end
 
+      # Magic link service
       def service
         PhcdevworksAccountsStytch::Authentication::B2c::MagicLinkService.new
       end
 
+      # Log error
       def log_error(message)
         Rails.logger.error(message)
       end

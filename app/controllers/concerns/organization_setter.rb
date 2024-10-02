@@ -3,12 +3,14 @@
 module OrganizationSetter
   extend ActiveSupport::Concern
 
+  # Set organization before action
   included do
     before_action :set_organization
   end
 
   private
 
+  # Set organization based on the slug
   def set_organization
     slug = params[:organization_slug]
     if slug.blank?
@@ -25,6 +27,7 @@ module OrganizationSetter
     end
   end
 
+  # Organization service
   def organization_service
     @organization_service ||= PhcdevworksAccountsStytch::Stytch::Organization.new
   end

@@ -9,8 +9,10 @@ module PhcdevworksAccountsStytch
 
       before_action :set_organization, only: %i[process_login_or_signup process_invite]
 
+      # Login or Signup
       def login_or_signup; end
 
+      # Process Login or Signup
       def process_login_or_signup
         if missing_login_or_signup_params?
           handle_missing_params_error('Email and Organization Slug are required.')
@@ -24,8 +26,10 @@ module PhcdevworksAccountsStytch
         end
       end
 
+      # Invite
       def invite; end
 
+      # Process Invite
       def process_invite
         if missing_invite_params?
           handle_missing_params_error('Email and Organization Slug are required.')
@@ -41,14 +45,17 @@ module PhcdevworksAccountsStytch
 
       private
 
+      # Check if email and organization ID are present
       def missing_login_or_signup_params?
         params[:email].blank? || @organization_id.blank?
       end
 
+      # Check if email and organization ID are present
       def missing_invite_params?
         params[:email].blank? || @organization_id.blank?
       end
 
+      # Magic Link service
       def service
         PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService.new
       end
