@@ -17,7 +17,7 @@ module PhcdevworksAccountsStytch
       # Process Reset Start
       def process_reset_start
         if missing_reset_start_params?
-          handle_missing_params_error('Email and Organization Slug are required.')
+          handle_missing_params_error('Organization slug is required')
           return
         end
 

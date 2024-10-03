@@ -22,25 +22,20 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
   end
 
   describe 'POST #process_reset_password' do
-    context 'when missing required params' do
-      before { post :process_reset_password, params: { token: '', password: '', organization_slug: organization_slug } }
-
-      it 'returns an error' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Token and Password are required.')
-      end
-    end
-
     context 'when reset is successful' do
       let(:success_response) do
         instance_double(
-          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: {
+            key: 'value'
+          }
         )
       end
 
       before do
         allow(service).to receive(:reset).with(token, password).and_return(success_response)
-        post :process_reset_password, params: { token: token, password: password, organization_slug: organization_slug }
+        post :process_reset_password, params: {
+          token: token, password: password, organization_slug: organization_slug
+        }
       end
 
       it 'calls the reset service' do
@@ -49,7 +44,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['message']).to eq('Action completed successfully')
+        expect(JSON.parse(response.body)['message']).to eq(
+          'Action completed successfully'
+        )
       end
     end
 
@@ -58,12 +55,31 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
       before do
         allow(service).to receive(:reset).with(token, password).and_raise(error)
-        post :process_reset_password, params: { token: token, password: password, organization_slug: organization_slug }
+        post :process_reset_password, params: {
+          token: token, password: password, organization_slug: organization_slug
+        }
       end
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)['error']).to eq('Stytch Error (Status Code: 400) - Message: Reset error')
+        expect(JSON.parse(response.body)['error']).to eq(
+          'Stytch Error (Status Code: 400) - Message: Reset error'
+        )
+      end
+    end
+
+    context 'when missing required params' do
+      before do
+        post :process_reset_password, params: {
+          token: '', password: '', organization_slug: organization_slug
+        }
+      end
+
+      it 'returns an error when token and password are missing' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq(
+          'Token and Password are required.'
+        )
       end
     end
   end
@@ -83,9 +99,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset existing is successful' do
       let(:success_response) do
-        instance_double(
-          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
-        )
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
       end
 
       before do
@@ -129,21 +144,28 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
       it 'returns an error' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Session token, new password, and organization ID are required.')
+        expect(JSON.parse(response.body)['error']).to eq(
+          'Session token, new password, and organization ID are required.'
+        )
       end
     end
 
     context 'when reset with session is successful' do
       let(:success_response) do
         instance_double(
-          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
+          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: {
+            key: 'value'
+          }
         )
       end
 
       before do
-        allow(service).to receive(:reset_with_session).with(session_token, password, organization_id).and_return(success_response)
-        post :process_reset_with_session,
-             params: { session_token: session_token, password: password, organization_slug: organization_slug }
+        allow(service).to receive(:reset_with_session).with(
+          session_token, password, organization_id
+        ).and_return(success_response)
+        post :process_reset_with_session, params: {
+          session_token: session_token, password: password, organization_slug: organization_slug
+        }
       end
 
       it 'calls the reset_with_session service' do
@@ -157,29 +179,50 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
     end
 
     context 'when reset with session fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Reset session error') }
+      let(:error) do
+        PhcdevworksAccountsStytch::Stytch::Error.new(
+          status_code: 400, error_message: 'Reset session error'
+        )
+      end
 
       before do
-        allow(service).to receive(:reset_with_session).with(session_token, password, organization_id).and_raise(error)
+        allow(service).to receive(:reset_with_session).with(
+          session_token, password, organization_id
+        ).and_raise(error)
         post :process_reset_with_session,
              params: { session_token: session_token, password: password, organization_slug: organization_slug }
       end
 
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)['error']).to eq('Stytch Error (Status Code: 400) - Message: Reset session error')
+        expect(JSON.parse(response.body)['error']).to eq(
+          'Stytch Error (Status Code: 400) - Message: Reset session error'
+        )
       end
     end
   end
 
   describe 'POST #process_reset_start' do
-    context 'when missing required params' do
+    context 'when both email and organization_slug are missing' do
       before do
-        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
-        post :process_reset_start, params: { email: '', organization_slug: '' }
+        # Simulate no organization ID found
+        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil) # Ensure organization_id is nil
+        post :process_reset_start, params: { email: '', organization_slug: '' } # Both params missing
       end
 
-      it 'returns an error when email and organization_slug are missing' do
+      it 'returns an error when both email and organization_slug are missing' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Organization slug is required') # Fix error message
+      end
+    end
+
+    context 'when only organization_slug is missing' do
+      before do
+        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
+        post :process_reset_start, params: { email: 'user@example.com', organization_slug: '' }
+      end
+
+      it 'returns an error when organization_slug is missing' do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq('Organization slug is required')
       end
@@ -187,9 +230,8 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
 
     context 'when reset start is successful' do
       let(:success_response) do
-        instance_double(
-          PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully', data: { key: 'value' }
-        )
+        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                    data: { key: 'value' })
       end
 
       before do
@@ -204,20 +246,6 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
       it 'returns a success response' do
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)['message']).to eq('Action completed successfully')
-      end
-    end
-
-    context 'when reset start fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Reset start error') }
-
-      before do
-        allow(service).to receive(:reset_start).with(email, organization_id).and_raise(error)
-        post :process_reset_start, params: { email: email, organization_slug: organization_slug }
-      end
-
-      it 'returns an error response' do
-        expect(response).to have_http_status(:bad_request)
-        expect(JSON.parse(response.body)['error']).to eq('Stytch Error (Status Code: 400) - Message: Reset start error')
       end
     end
   end

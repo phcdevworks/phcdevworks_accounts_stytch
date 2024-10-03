@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :controller do
   routes { PhcdevworksAccountsStytch::Engine.routes }
 
+  # Stubbing the magic link and password services
   let(:magic_link_service) { instance_double(PhcdevworksAccountsStytch::Authentication::B2b::MagicLinkService) }
   let(:password_service) { instance_double(PhcdevworksAccountsStytch::Authentication::B2b::PasswordService) }
   let(:email) { 'user@example.com' }
@@ -17,7 +18,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
     allow(PhcdevworksAccountsStytch::Authentication::B2b::PasswordService).to receive(:new).and_return(password_service)
   end
 
+  # Testing the authenticate action
   describe 'POST #authenticate' do
+    # Testing when magic link token is present
     context 'when magic link token is present' do
       before do
         post :authenticate, params: { token: magic_links_token }
@@ -28,6 +31,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when email, password, and organization ID are present
     context 'when email, password, and organization ID are present' do
       before do
         post :authenticate, params: { email: email, password: password, organization_id: organization_id }
@@ -40,6 +44,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when credentials are missing
     context 'when credentials are missing' do
       before do
         post :authenticate, params: {}
@@ -52,6 +57,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when a ServerError occurs
     context 'when a ServerError occurs' do
       before do
         allow(controller).to receive(:magic_link_token_present?).and_raise(
@@ -61,14 +67,14 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
 
       it 'handles the server error and calls handle_server_error' do
-        expect(response).to have_http_status(:service_unavailable) # 503
+        expect(response).to have_http_status(:service_unavailable)
         expect(JSON.parse(response.body)).to include('error' => 'Server error occurred')
       end
     end
 
+    # Testing when an unexpected error occurs in authenticate
     context 'when an unexpected error occurs in authenticate' do
       before do
-        # Simulate an unexpected StandardError to trigger handle_unexpected_error
         allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
 
         post :authenticate, params: { token: magic_links_token }
@@ -81,6 +87,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
     end
   end
 
+  # Testing the process_authenticate action
   describe 'POST #process_authenticate' do
     context 'when authenticating with a magic link token' do
       let(:success_response) do
@@ -105,6 +112,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when magic link authentication fails
     context 'when magic link authentication fails' do
       let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Authentication error') }
 
@@ -120,6 +128,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when a ServerError occurs during magic link authentication
     context 'when a ServerError occurs during magic link authentication' do
       before do
         allow(magic_link_service).to receive(:process_authenticate).with(magic_links_token).and_raise(
@@ -129,11 +138,12 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
 
       it 'handles the server error and returns the correct status and message' do
-        expect(response).to have_http_status(:service_unavailable) # 503
+        expect(response).to have_http_status(:service_unavailable)
         expect(JSON.parse(response.body)).to include('error' => 'Server error occurred')
       end
     end
 
+    # Testing when authenticating with email and password
     context 'when authenticating with email, password, and organization ID' do
       let(:success_response) do
         PhcdevworksAccountsStytch::Stytch::Success.new(
@@ -158,6 +168,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when password authentication fails
     context 'when password authentication fails' do
       let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Authentication error') }
 
@@ -174,6 +185,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when a ServerError occurs during password authentication
     context 'when credentials are missing' do
       before do
         post :process_authenticate, params: {}
@@ -186,6 +198,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::AuthenticateController, type: :co
       end
     end
 
+    # Testing when an unexpected error occurs in process_authenticate
     context 'when an unexpected error occurs in process_authenticate' do
       before do
         allow(controller).to receive(:magic_link_token_present?).and_raise(StandardError.new('Unexpected error'))
