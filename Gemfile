@@ -5,6 +5,7 @@ gemspec
 
 gem 'puma'
 gem 'sprockets-rails'
+gem 'sqlite3'
 
 group :development, :test do
   gem 'bundler', '~> 2.5'
@@ -22,7 +23,6 @@ group :development, :test do
   gem 'rubocop-rake', '~> 0.6.0', require: false
   gem 'rubocop-rspec', '~> 3.0', require: false
   gem 'simplecov', '~> 0.22.0', require: false
-  gem 'sqlite3', '~> 1.4'
   gem 'vcr', '~> 6.2'
   gem 'webmock', '~> 3.23'
 end

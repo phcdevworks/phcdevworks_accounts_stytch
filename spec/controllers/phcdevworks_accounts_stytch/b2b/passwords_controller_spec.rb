@@ -51,7 +51,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
     end
 
     context 'when reset fails' do
-      let(:error) { PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Reset error') }
+      let(:error) do
+        PhcdevworksAccountsStytch::Stytch::Error.new(status_code: 400, error_message: 'Reset error')
+      end
 
       before do
         allow(service).to receive(:reset).with(token, password).and_raise(error)
@@ -203,50 +205,71 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::PasswordsController, type: :contr
   end
 
   describe 'POST #process_reset_start' do
-    context 'when both email and organization_slug are missing' do
-      before do
-        # Simulate no organization ID found
-        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil) # Ensure organization_id is nil
-        post :process_reset_start, params: { email: '', organization_slug: '' } # Both params missing
-      end
-
-      it 'returns an error when both email and organization_slug are missing' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Organization slug is required') # Fix error message
-      end
+  context 'when both email and organization_slug are missing' do
+    before do
+      allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
+      post :process_reset_start, params: { email: '', organization_slug: '' }
     end
 
-    context 'when only organization_slug is missing' do
-      before do
-        allow(organization_service).to receive(:find_organization_id_by_slug).with('').and_return(nil)
-        post :process_reset_start, params: { email: 'user@example.com', organization_slug: '' }
-      end
-
-      it 'returns an error when organization_slug is missing' do
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Organization slug is required')
-      end
-    end
-
-    context 'when reset start is successful' do
-      let(:success_response) do
-        instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
-                                                                    data: { key: 'value' })
-      end
-
-      before do
-        allow(service).to receive(:reset_start).with(email, organization_id).and_return(success_response)
-        post :process_reset_start, params: { email: email, organization_slug: organization_slug }
-      end
-
-      it 'calls the reset_start service' do
-        expect(service).to have_received(:reset_start).with(email, organization_id)
-      end
-
-      it 'returns a success response' do
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['message']).to eq('Action completed successfully')
-      end
+    it 'returns an error when both email and organization_slug are missing' do
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)['error']).to eq('Organization slug is required')
     end
   end
+
+  context 'when organization_slug is missing' do
+    before do
+      allow(controller).to receive(:missing_reset_start_params?).and_return(true)
+      allow(controller).to receive(:handle_missing_params_error).and_call_original
+      post :process_reset_start, params: { email: 'user@example.com', organization_slug: '' }
+    end
+
+    it 'handles missing params error' do
+      expect(controller).to have_received(:handle_missing_params_error).with('Organization slug is required').once
+    end
+
+    it 'does not proceed further' do
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+  context 'when email is missing' do
+    before do
+      allow(controller).to receive(:missing_reset_start_params?).and_return(true)
+      allow(controller).to receive(:handle_missing_params_error).and_call_original
+      allow(organization_service).to receive(:find_organization_id_by_slug).with('some_slug').and_return(nil)
+      post :process_reset_start, params: { email: '', organization_slug: 'some_slug' }
+    end
+
+    it 'handles missing params error' do
+      expect(controller).to have_received(:handle_missing_params_error).with('Organization slug is required').once
+    end
+
+    it 'does not proceed further' do
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+  context 'when reset start is successful' do
+    let(:success_response) do
+      instance_double(PhcdevworksAccountsStytch::Stytch::Success, message: 'Action completed successfully',
+                                                                  data: { key: 'value' })
+    end
+
+    before do
+      allow(service).to receive(:reset_start).with(email, organization_id).and_return(success_response)
+      allow(organization_service).to receive(:find_organization_id_by_slug).with(organization_slug).and_return(organization_id)
+      post :process_reset_start, params: { email: email, organization_slug: organization_slug }
+    end
+
+    it 'calls the reset_start service' do
+      expect(service).to have_received(:reset_start).with(email, organization_id)
+    end
+
+    it 'returns a success response' do
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)['message']).to eq('Action completed successfully')
+    end
+  end
+end
 end

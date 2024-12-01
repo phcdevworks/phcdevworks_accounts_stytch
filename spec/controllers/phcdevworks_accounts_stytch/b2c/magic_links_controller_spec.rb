@@ -150,25 +150,25 @@ RSpec.describe PhcdevworksAccountsStytch::B2c::MagicLinksController, type: :cont
     end
 
     context 'when revoke invite is successful' do
+      let(:mock_logger) { instance_double('Logger') }
+    
       before do
         success_response = { message: 'Invite revoked successfully', data: { key: 'value' } }
         allow(service).to receive(:process_revoke_invite).with(email).and_return(success_response)
-
-        # Create a mock logger specifically for this test
-        @mock_logger = double('logger')
-        allow(@mock_logger).to receive(:info)
-        allow(Rails).to receive(:logger).and_return(@mock_logger)
+    
+        allow(mock_logger).to receive(:info)
+        allow(Rails).to receive(:logger).and_return(mock_logger)
       end
-
+    
       it 'logs the success message' do
-        expect(@mock_logger).to receive(:info).with('Revoke invite successful: Invite revoked successfully')
-
         post :process_revoke_invite, params: { email: email }
+    
+        expect(mock_logger).to have_received(:info).with('Revoke invite successful: Invite revoked successfully')
       end
-
+    
       it 'returns a success response' do
         post :process_revoke_invite, params: { email: email }
-
+    
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)).to include('message' => 'Invite revoked successfully')
       end
