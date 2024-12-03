@@ -15,7 +15,7 @@ jobs:
     steps:
     # Step 1: Check out the repository
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
 
     # Step 2: Set up Ruby environment
     - name: Set up Ruby
