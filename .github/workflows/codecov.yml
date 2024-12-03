@@ -15,7 +15,7 @@ jobs:
     steps:
     # Step 1: Check out the repository
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v5
 
     # Step 2: Set up Ruby environment
     - name: Set up Ruby
@@ -40,14 +40,14 @@ jobs:
 
     # Step 5: Upload RSpec test results (test analytics)
     - name: Upload RSpec test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: rspec-results
         path: tmp/rspec_results.json
 
     # Step 6: Upload coverage to Codecov
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         file: coverage/.resultset.json
         token: ${{ secrets.CODECOV_TOKEN }}
