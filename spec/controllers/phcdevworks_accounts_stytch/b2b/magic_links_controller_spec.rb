@@ -37,7 +37,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
     end
 
     context 'when login or signup params are present' do
-      let(:result) { instance_double('Result', data: { key: 'value' }) }
+      let(:result) { instance_double(PhcdevworksAccountsStytch::Stytch::Success, data: { key: 'value' }) }
 
       before do
         allow(controller).to receive(:missing_login_or_signup_params?).and_return(false)
