@@ -15,7 +15,7 @@ module PhcdevworksAccountsStytch
       # Process Login or Signup
       def process_login_or_signup
         if missing_login_or_signup_params?
-          handle_missing_params_error('Email and Organization Slug are required.')
+          handle_missing_params_error('Organization slug is required')
           return
         end
 

@@ -21,8 +21,10 @@ module OrganizationSetter
     begin
       @organization_id = organization_service.find_organization_id_by_slug(slug)
     rescue PhcdevworksAccountsStytch::Stytch::Error => e
+      Rails.logger.error("Stytch Error: #{e.error_message}")
       handle_missing_params_error("Stytch Error - Message: #{e.error_message}")
     rescue StandardError => e
+      Rails.logger.error("Standard Error: #{e.message}")
       handle_missing_params_error(e.message)
     end
   end

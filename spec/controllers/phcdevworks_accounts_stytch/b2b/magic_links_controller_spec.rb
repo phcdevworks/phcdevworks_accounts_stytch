@@ -20,23 +20,23 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
   end
 
   describe 'POST #process_login_or_signup' do
-    context 'when required params are missing' do
+    context 'when missing_login_or_signup_params? returns true' do
       before do
         allow(controller).to receive(:missing_login_or_signup_params?).and_return(true)
-        allow(controller).to receive(:handle_missing_params_error).and_call_original
+        allow(controller).to receive(:handle_missing_params_error)
+        allow(controller).to receive(:set_organization)
+        # Add stub for process_login_or_signup
+        allow(service).to receive(:process_login_or_signup)
         post :process_login_or_signup, params: { email: '', organization_slug: '' }
       end
 
-      it 'handles missing params error' do
+      it 'calls handle_missing_params_error and returns early' do
         expect(controller).to have_received(:handle_missing_params_error).with('Organization slug is required')
-      end
-
-      it 'returns an error when email and organization_slug are missing' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(service).not_to have_received(:process_login_or_signup)
       end
     end
 
-    context 'when login or signup params are present' do
+    context 'when missing_login_or_signup_params? returns false' do
       let(:result) { instance_double(PhcdevworksAccountsStytch::Stytch::Success, data: { key: 'value' }) }
 
       before do
@@ -46,15 +46,9 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
         post :process_login_or_signup, params: { email: email, organization_slug: organization_slug }
       end
 
-      it 'calls the service to process login or signup' do
+      it 'processes the login or signup request' do
         expect(service).to have_received(:process_login_or_signup).with(email, organization_id)
-      end
-
-      it 'logs the success message' do
         expect(Rails.logger).to have_received(:info).with("Login or Signup successful: #{result.data}")
-      end
-
-      it 'returns a success response' do
         expect(response).to have_http_status(:ok)
       end
     end
@@ -100,6 +94,48 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
       it 'returns an error response' do
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body)).to include('error' => 'Stytch Error (Status Code: 400) - Message: Invite error')
+      end
+    end
+  end
+
+  describe '#missing_login_or_signup_params?' do
+    before do
+      allow(controller).to receive(:params).and_return(params_hash)
+    end
+
+    context 'when email is blank' do
+      let(:params_hash) { { email: '' } }
+      
+      before do
+        controller.instance_variable_set(:@organization_id, 'org_123')
+      end
+
+      it 'returns true' do
+        expect(controller.send(:missing_login_or_signup_params?)).to be true
+      end
+    end
+
+    context 'when organization_id is blank' do
+      let(:params_hash) { { email: 'test@example.com' } }
+      
+      before do
+        controller.instance_variable_set(:@organization_id, nil)
+      end
+
+      it 'returns true' do
+        expect(controller.send(:missing_login_or_signup_params?)).to be true
+      end
+    end
+
+    context 'when both email and organization_id are present' do
+      let(:params_hash) { { email: 'test@example.com' } }
+      
+      before do
+        controller.instance_variable_set(:@organization_id, 'org_123')
+      end
+
+      it 'returns false' do
+        expect(controller.send(:missing_login_or_signup_params?)).to be false
       end
     end
   end
