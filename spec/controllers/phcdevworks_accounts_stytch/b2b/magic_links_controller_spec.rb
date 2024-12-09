@@ -105,7 +105,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
     context 'when email is blank' do
       let(:params_hash) { { email: '' } }
-      
+
       before do
         controller.instance_variable_set(:@organization_id, 'org_123')
       end
@@ -117,7 +117,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
     context 'when organization_id is blank' do
       let(:params_hash) { { email: 'test@example.com' } }
-      
+
       before do
         controller.instance_variable_set(:@organization_id, nil)
       end
@@ -129,7 +129,7 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::MagicLinksController, type: :cont
 
     context 'when both email and organization_id are present' do
       let(:params_hash) { { email: 'test@example.com' } }
-      
+
       before do
         controller.instance_variable_set(:@organization_id, 'org_123')
       end
