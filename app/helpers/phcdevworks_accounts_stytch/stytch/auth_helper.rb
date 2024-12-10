@@ -10,7 +10,6 @@ module PhcdevworksAccountsStytch
       end
 
       def logged_in?
-        # Your logic to check if the user is logged in
         !!session[:user_id]
       end
     end

@@ -6,22 +6,21 @@ RSpec.describe PhcdevworksAccountsStytch::Stytch::AuthHelper do
   let(:dummy_class) do
     Class.new do
       include PhcdevworksAccountsStytch::Stytch::AuthHelper
-      
+
       attr_accessor :session
-      
+
       def initialize
         @session = {}
       end
 
-      def redirect_to(path, options = {})
-      end
+      def redirect_to(path, options = {}); end
 
       def login_path
         :login_path
       end
     end
   end
-  
+
   let(:helper) { dummy_class.new }
 
   describe '#logged_in?' do
