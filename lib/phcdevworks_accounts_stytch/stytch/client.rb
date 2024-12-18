@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# Ensures that all string literals in this file are immutable.
 
 module PhcdevworksAccountsStytch
   module Stytch

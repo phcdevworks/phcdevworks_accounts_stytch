@@ -15,8 +15,6 @@ module PhcdevworksAccountsStytch
         end
       end
 
-      private
-
       # Default status message for a given status code
       def self.default_status_message(status_code)
         case status_code
@@ -60,9 +58,11 @@ module PhcdevworksAccountsStytch
 
       # Log an error
       def self.log_error(status_code, error_code, error_message)
+        return unless defined?(Rails)
+
         Rails.logger.error(
           "[Stytch API Error] Status Code: #{status_code}, Error Code: #{error_code}, Message: #{error_message}"
-        ) if defined?(Rails)
+        )
       end
     end
   end

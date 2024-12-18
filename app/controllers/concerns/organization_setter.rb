@@ -18,15 +18,38 @@ module OrganizationSetter
       return
     end
 
-    begin
-      @organization_id = organization_service.find_organization_id_by_slug(slug)
-    rescue PhcdevworksAccountsStytch::Stytch::Error => e
-      Rails.logger.error("Stytch Error: #{e.error_message}")
-      handle_missing_params_error("Stytch Error - Message: #{e.error_message}")
-    rescue StandardError => e
-      Rails.logger.error("Standard Error: #{e.message}")
-      handle_missing_params_error(e.message)
-    end
+    @organization_id = fetch_organization_id(slug)
+  end
+
+  # Fetch organization ID based on slug
+  def fetch_organization_id(slug)
+    organization_service.find_organization_id_by_slug(slug)
+  rescue PhcdevworksAccountsStytch::Stytch::Error => e
+    handle_stytch_error(e)
+  rescue StandardError => e
+    handle_standard_error(e)
+  end
+
+  # Handle Stytch-specific errors
+  def handle_stytch_error(error)
+    Rails.logger.error("Stytch Error: #{error.message} (Code: #{error.error_code}, Status: #{error.status_code})")
+    render json: {
+      error: "Stytch Error - #{error.error_message}",
+      code: error.error_code,
+      details: error.to_h
+    }, status: error.status_code
+  end
+
+  # Handle unexpected errors
+  def handle_standard_error(error)
+    Rails.logger.error("Standard Error: #{error.message}")
+    render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+  end
+
+  # Handle missing parameters errors
+  def handle_missing_params_error(message)
+    Rails.logger.error("Missing Params Error: #{message}")
+    render json: { error: message }, status: :unprocessable_entity
   end
 
   # Organization service

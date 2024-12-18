@@ -48,10 +48,12 @@ module PhcdevworksAccountsStytch
 
       # Handle the error
       def handle_error(error)
-        error = PhcdevworksAccountsStytch::Stytch::Error.new(
-          status_code: error.status_code || 500,
-          error_message: error.message
-        ) unless error.respond_to?(:status_code)
+        unless error.respond_to?(:status_code)
+          error = PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: error.status_code || 500,
+            error_message: error.message
+          )
+        end
 
         log_error(error)
 

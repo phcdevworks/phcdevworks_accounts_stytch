@@ -6,7 +6,8 @@ module PhcdevworksAccountsStytch
       attr_reader :status_code, :error_code, :error_message, :cause, :original_error
 
       # Initialize the error
-      def initialize(status_code: 500, error_code: 'unknown_error', error_message: 'An unknown error occurred', cause: nil, original_error: nil)
+      def initialize(status_code: 500, error_code: 'unknown_error', error_message: 'An unknown error occurred', cause: nil,
+                     original_error: nil)
         @status_code = status_code
         @error_code = error_code
         @error_message = error_message

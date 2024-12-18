@@ -37,9 +37,9 @@ module PhcdevworksAccountsStytch
 
       # Validate that the status code is within the success range.
       def validate_status_code(status_code)
-        unless status_code.between?(200, 299)
-          raise ArgumentError, "Invalid status code for success: #{status_code}"
-        end
+        return if status_code.between?(200, 299)
+
+        raise ArgumentError, "Invalid status code for success: #{status_code}"
       end
 
       # Log the success response.

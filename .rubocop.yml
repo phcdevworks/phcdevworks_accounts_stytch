@@ -45,7 +45,10 @@ Layout/LineLength:
   AllowURI: true
 
 Metrics/MethodLength:
-  Max: 20
+  Max: 25
+
+Metrics/CyclomaticComplexity:
+  Max: 10
 
 Metrics/AbcSize:
   Max: 20

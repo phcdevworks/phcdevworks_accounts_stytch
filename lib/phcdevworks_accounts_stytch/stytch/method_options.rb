@@ -25,10 +25,10 @@ module PhcdevworksAccountsStytch
 
       # Add the Authorization header
       def add_authorization_header(headers)
-        if options[:authorization].is_a?(Hash)
-          session_token = options[:authorization][:session_token]
-          headers['Authorization'] = "Bearer #{session_token}" if session_token
-        end
+        return unless options[:authorization].is_a?(Hash)
+
+        session_token = options[:authorization][:session_token]
+        headers['Authorization'] = "Bearer #{session_token}" if session_token
       end
 
       # Add other custom headers
