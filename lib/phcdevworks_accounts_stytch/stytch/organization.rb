@@ -22,34 +22,38 @@ module PhcdevworksAccountsStytch
 
       # Search for an organization by slug
       def search_organization_by_slug(slug)
-        @client.organizations.search(
-          query: {
-            operator: 'OR',
-            operands: [
-              { filter_name: 'organization_slugs', filter_value: [slug] }
-            ]
-          }
-        )
+        query = {
+          operator: 'OR',
+          operands: [
+            { filter_name: 'organization_slugs', filter_value: [slug] }
+          ]
+        }
+        @client.organizations.search(query: query)
+      rescue Stytch::Error => e
+        raise PhcdevworksAccountsStytch::Stytch::Error.from_stytch_error(e)
       end
 
       # Extract the organization ID from the response
       def extract_organization_id(response, slug)
-        organizations = response['organizations']
+        organizations = response['organizations'] || []
         organization = organizations.first
 
-        if organization
-          organization['organization_id']
-        else
-          raise PhcdevworksAccountsStytch::Stytch::Error.new(
-            status_code: 404,
-            error_message: "Organization with slug '#{slug}' not found"
-          )
-        end
+        return organization['organization_id'] if organization
+
+        raise PhcdevworksAccountsStytch::Stytch::Error.new(
+          status_code: 404,
+          error_message: "Organization with slug '#{slug}' not found"
+        )
       end
 
       # Handle the error
       def handle_error(error)
-        error = PhcdevworksAccountsStytch::Stytch::ServerError.new(error.message) unless error.respond_to?(:status_code)
+        error = PhcdevworksAccountsStytch::Stytch::Error.new(
+          status_code: error.status_code || 500,
+          error_message: error.message
+        ) unless error.respond_to?(:status_code)
+
+        log_error(error)
 
         case error.status_code
         when 404
@@ -63,11 +67,13 @@ module PhcdevworksAccountsStytch
             error_message: 'Forbidden access'
           )
         else
-          raise PhcdevworksAccountsStytch::Stytch::Error.new(
-            status_code: error.status_code || 500,
-            error_message: error.message
-          )
+          raise error
         end
+      end
+
+      # Log the error
+      def log_error(error)
+        Rails.logger.error("Error: #{error.message} (Status Code: #{error.status_code})") if defined?(Rails)
       end
     end
   end
