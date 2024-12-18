@@ -1,46 +1,45 @@
 # frozen_string_literal: true
+# Ensures that all string literals in this file are immutable.
 
 module PhcdevworksAccountsStytch
   module Stytch
     class Client
       class << self
-        # Create the B2B client
+        # Initializes and retrieves the B2B client, using memoization.
         def b2b_client
-          @b2b_client ||= create_b2b_client
+          @b2b_client ||= create_client(:b2b, StytchB2B::Client)
         end
 
-        # Create the B2C client
+        # Initializes and retrieves the B2C client, using memoization.
         def b2c_client
-          @b2c_client ||= create_b2c_client
+          @b2c_client ||= create_client(:b2c, ::Stytch::Client)
         end
 
         private
 
-        # Create the B2B client
-        def create_b2b_client
-          project_id = Rails.application.credentials.dig(:stytch, :b2b, :project_id)
-          secret = Rails.application.credentials.dig(:stytch, :b2b, :secret)
-          unless project_id && secret
-            raise PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Stytch B2B credentials are missing')
-          end
+        # Creates a client for the given type using the provided client class.
+        def create_client(type, client_class)
+          credentials = fetch_credentials(type)
+          raise_missing_credentials_error(type) unless credentials
 
-          StytchB2B::Client.new(
-            project_id: project_id,
-            secret: secret
+          client_class.new(
+            project_id: credentials[:project_id],
+            secret: credentials[:secret]
           )
         end
 
-        # Create the B2C client
-        def create_b2c_client
-          project_id = Rails.application.credentials.dig(:stytch, :b2c, :project_id)
-          secret = Rails.application.credentials.dig(:stytch, :b2c, :secret)
-          unless project_id && secret
-            raise PhcdevworksAccountsStytch::Stytch::Error.new(error_message: 'Stytch B2C credentials are missing')
-          end
+        # Fetches credentials for the specified client type.
+        def fetch_credentials(type)
+          {
+            project_id: Rails.application.credentials.dig(:stytch, type, :project_id),
+            secret: Rails.application.credentials.dig(:stytch, type, :secret)
+          }.compact.presence
+        end
 
-          ::Stytch::Client.new(
-            project_id: project_id,
-            secret: secret
+        # Raises an error if credentials are missing for the specified client type.
+        def raise_missing_credentials_error(type)
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            error_message: "Stytch #{type.to_s.upcase} credentials are missing"
           )
         end
       end
