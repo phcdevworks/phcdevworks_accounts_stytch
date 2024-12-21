@@ -16,7 +16,7 @@ module PhcdevworksAccountsStytch
             organization_id: organization_id,
             email_address: email
           )
-          handle_response(response)
+          handle_response(response, 'User logged in or signed up successfully')
         end
 
         # Process the invite
@@ -26,26 +26,27 @@ module PhcdevworksAccountsStytch
           response = @client.magic_links.email.invite(
             organization_id: organization_id,
             email_address: email,
-            method_options: options
+            method_options: options.to_h # Ensure method options are properly formatted
           )
-          handle_response(response)
+          handle_response(response, 'Invitation sent successfully')
         end
 
         # Process the authenticate
         def process_authenticate(magic_links_token)
           log_action('Authenticate', magic_links_token: magic_links_token)
           response = @client.magic_links.authenticate(magic_links_token: magic_links_token)
-          handle_response(response)
+          handle_response(response, 'Magic Link authenticated successfully')
         end
 
         private
 
         # Handle the response
-        def handle_response(response)
-          PhcdevworksAccountsStytch::Stytch::Response.handle_response(response)
+        def handle_response(response, success_message)
+          PhcdevworksAccountsStytch::Stytch::Response.handle_response(response).tap do |result|
+            Rails.logger.info(success_message)
+          end
         rescue PhcdevworksAccountsStytch::Stytch::Error => e
-          log_error(e)
-          raise
+          handle_stytch_error(e)
         end
 
         # Build the method options
@@ -60,10 +61,10 @@ module PhcdevworksAccountsStytch
           Rails.logger.info "Starting #{action_name} with details: #{details.inspect}"
         end
 
-        # Log the error
-        def log_error(error)
-          Rails.logger.error "Error occurred: #{error.message}"
-          Rails.logger.error error.backtrace.join("\n")
+        # Handle Stytch-specific errors
+        def handle_stytch_error(error)
+          Rails.logger.error "Stytch Error: #{error.message} (Code: #{error.error_code}, Status: #{error.status_code})"
+          raise
         end
       end
     end

@@ -14,8 +14,12 @@ module PhcdevworksAccountsStytch
       def find_organization_id_by_slug(slug)
         response = search_organization_by_slug(slug)
         extract_organization_id(response, slug)
-      rescue StandardError => e
-        handle_error(e)
+      rescue ::Stytch::Error => e
+        raise PhcdevworksAccountsStytch::Stytch::Error.new(
+          status_code: e.status_code,
+          error_code: 'stytch_error',
+          error_message: e.message
+        )
       end
 
       private
@@ -28,9 +32,15 @@ module PhcdevworksAccountsStytch
             { filter_name: 'organization_slugs', filter_value: [slug] }
           ]
         }
-        @client.organizations.search(query: query)
-      rescue Stytch::Error => e
-        raise PhcdevworksAccountsStytch::Stytch::Error.from_stytch_error(e)
+        begin
+          @client.organizations.search(query: query)
+        rescue Stytch::Error => e
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: e.status_code,
+            error_code: 'stytch_error',
+            error_message: e.message
+          )
+        end
       end
 
       # Extract the organization ID from the response
@@ -42,40 +52,49 @@ module PhcdevworksAccountsStytch
 
         raise PhcdevworksAccountsStytch::Stytch::Error.new(
           status_code: 404,
+          error_code: 'not_found',
           error_message: "Organization with slug '#{slug}' not found"
         )
       end
 
       # Handle the error
       def handle_error(error)
-        unless error.respond_to?(:status_code)
-          error = PhcdevworksAccountsStytch::Stytch::Error.new(
-            status_code: error.status_code || 500,
-            error_message: error.message
-          )
-        end
+        # Wrap errors that don't have a status_code
+        wrapped_error = if error.respond_to?(:status_code)
+                          error
+                        else
+                          PhcdevworksAccountsStytch::Stytch::Error.new(
+                            status_code: 500,
+                            error_code: 'unknown_error',
+                            error_message: "Unexpected error: #{error.message}"
+                          )
+                        end
 
-        log_error(error)
+        log_error(wrapped_error)
 
-        case error.status_code
+        case wrapped_error.status_code
         when 404
           raise PhcdevworksAccountsStytch::Stytch::Error.new(
             status_code: 404,
+            error_code: 'not_found',
             error_message: 'Organization not found'
           )
         when 403
           raise PhcdevworksAccountsStytch::Stytch::Error.new(
             status_code: 403,
+            error_code: 'forbidden',
             error_message: 'Forbidden access'
           )
         else
-          raise error
+          raise wrapped_error
         end
       end
 
       # Log the error
       def log_error(error)
-        Rails.logger.error("Error: #{error.message} (Status Code: #{error.status_code})") if defined?(Rails)
+        return unless defined?(Rails.logger)
+
+        Rails.logger.error("Error: #{error.message} (Status Code: #{error.status_code})")
       end
     end
   end

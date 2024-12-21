@@ -1,76 +1,128 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
 
 RSpec.describe PhcdevworksAccountsStytch::Stytch::Client do
-  let(:b2b_project_id) { 'b2b_project_id' }
-  let(:b2b_secret) { 'b2b_secret' }
-  let(:b2c_project_id) { 'b2c_project_id' }
-  let(:b2c_secret) { 'b2c_secret' }
-
-  before do
-    allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :project_id).and_return(b2b_project_id)
-    allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :secret).and_return(b2b_secret)
-    allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :project_id).and_return(b2c_project_id)
-    allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :secret).and_return(b2c_secret)
-
-    described_class.instance_variable_set(:@b2b_client, nil)
-    described_class.instance_variable_set(:@b2c_client, nil)
-  end
-
-  describe '.b2b_client' do
-    let(:client) { instance_double(StytchB2B::Client) }
-
-    before do
-      allow(StytchB2B::Client).to receive(:new).and_return(client)
-    end
-
-    it 'initializes the B2B client with correct credentials' do
-      described_class.b2b_client
-      expect(StytchB2B::Client).to have_received(:new).with(project_id: b2b_project_id, secret: b2b_secret)
-    end
-
-    it 'returns the same instance on subsequent calls' do
-      first_call = described_class.b2b_client
-      second_call = described_class.b2b_client
-      expect(first_call).to eq(second_call)
-    end
-
-    it 'raises a custom error if B2B credentials are missing' do
-      allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :project_id).and_return(nil)
-      allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2b, :secret).and_return(nil)
-
-      expect do
-        described_class.b2b_client
-      end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error, /Stytch B2B credentials are missing/)
+  class MockStytchB2BClient
+    def initialize(project_id:, secret:)
+      @project_id = project_id
+      @secret = secret
     end
   end
 
-  describe '.b2c_client' do
-    let(:client) { instance_double(::Stytch::Client) }
+  class MockStytchB2CClient
+    def initialize(project_id:, secret:)
+      @project_id = project_id
+      @secret = secret
+    end
+  end
 
+  describe 'class methods' do
     before do
-      allow(::Stytch::Client).to receive(:new).and_return(client)
+      described_class.instance_variable_set(:@b2b_client, nil)
+      described_class.instance_variable_set(:@b2c_client, nil)
     end
 
-    it 'initializes the B2C client with correct credentials' do
-      described_class.b2c_client
-      expect(::Stytch::Client).to have_received(:new).with(project_id: b2c_project_id, secret: b2c_secret)
+    describe '.b2b_client' do
+      context 'when B2B credentials are missing' do
+        before do
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2b, :project_id)
+            .and_return(nil)
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2b, :secret)
+            .and_return(nil)
+        end
+
+        it 'raises a credentials missing error' do
+          expect {
+            described_class.b2b_client
+          }.to raise_error(
+            PhcdevworksAccountsStytch::Stytch::Error,
+            /Stytch Error \(Status Code: 500\) - Code: unknown_error - Message: Stytch B2B credentials are missing/
+          )
+        end
+      end
     end
 
-    it 'returns the same instance on subsequent calls' do
-      first_call = described_class.b2c_client
-      second_call = described_class.b2c_client
-      expect(first_call).to eq(second_call)
+    describe '.b2c_client' do
+      context 'when B2C credentials are missing' do
+        before do
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2c, :project_id)
+            .and_return(nil)
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2c, :secret)
+            .and_return(nil)
+        end
+
+        it 'raises a credentials missing error' do
+          expect {
+            described_class.b2c_client
+          }.to raise_error(
+            PhcdevworksAccountsStytch::Stytch::Error,
+            /Stytch Error \(Status Code: 500\) - Code: unknown_error - Message: Stytch B2C credentials are missing/
+          )
+        end
+      end
     end
 
-    it 'raises a custom error if B2C credentials are missing' do
-      allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :project_id).and_return(nil)
-      allow(Rails.application.credentials).to receive(:dig).with(:stytch, :b2c, :secret).and_return(nil)
+    describe '.b2b_client' do
+      context 'when B2B credentials are present' do
+        before do
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2b, :project_id)
+            .and_return('test_b2b_project_id')
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2b, :secret)
+            .and_return('test_b2b_secret')
+          
+          stub_const('StytchB2B::Client', MockStytchB2BClient)
+        end
 
-      expect do
-        described_class.b2c_client
-      end.to raise_error(PhcdevworksAccountsStytch::Stytch::Error, /Stytch B2C credentials are missing/)
+        it 'creates and returns a B2B Stytch client' do
+          client = described_class.b2b_client
+          
+          expect(client).to be_a(MockStytchB2BClient)
+          expect(client.instance_variable_get(:@project_id)).to eq('test_b2b_project_id')
+          expect(client.instance_variable_get(:@secret)).to eq('test_b2b_secret')
+        end
+
+        it 'memoizes the B2B client' do
+          first_client = described_class.b2b_client
+          second_client = described_class.b2b_client
+
+          expect(first_client).to be(second_client)
+        end
+      end
+    end
+
+    describe '.b2c_client' do
+      context 'when B2C credentials are present' do
+        before do
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2c, :project_id)
+            .and_return('test_b2c_project_id')
+          allow(Rails.application.credentials).to receive(:dig)
+            .with(:stytch, :b2c, :secret)
+            .and_return('test_b2c_secret')
+          
+          stub_const('Stytch::Client', MockStytchB2CClient)
+        end
+
+        it 'creates and returns a B2C Stytch client' do
+          client = described_class.b2c_client
+          
+          expect(client).to be_a(MockStytchB2CClient)
+          expect(client.instance_variable_get(:@project_id)).to eq('test_b2c_project_id')
+          expect(client.instance_variable_get(:@secret)).to eq('test_b2c_secret')
+        end
+
+        it 'memoizes the B2C client' do
+          first_client = described_class.b2c_client
+          second_client = described_class.b2c_client
+
+          expect(first_client).to be(second_client)
+        end
+      end
     end
   end
 end
