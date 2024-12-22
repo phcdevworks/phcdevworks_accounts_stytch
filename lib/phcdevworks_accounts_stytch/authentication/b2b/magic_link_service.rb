@@ -4,7 +4,6 @@ module PhcdevworksAccountsStytch
   module Authentication
     module B2b
       class MagicLinkService
-        # Initialize the client
         def initialize
           @client = PhcdevworksAccountsStytch::Stytch::Client.b2b_client
         end
@@ -20,22 +19,17 @@ module PhcdevworksAccountsStytch
         end
 
         # Process the invite
-        def process_invite(email, organization_id, session_token)
-          log_action('Invite', email: email, organization_id: organization_id)
-          options = build_method_options(session_token)
-          response = @client.magic_links.email.invite(
-            organization_id: organization_id,
-            email_address: email,
-            method_options: options.to_h # Ensure method options are properly formatted
+        def process_revoke_invite(email, organization_id)
+          log_action('Revoke Invite', email: email, organization_id: organization_id)
+          response = @client.magic_links.revoke(email: email, organization_id: organization_id)
+          handle_response(response, 'Invite revoked successfully')
+        rescue SomeStytchSpecificError => e
+          # Map the error code to a not-found status
+          raise PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: e.error_code == 'invite_not_found' ? 404 : 400,
+            error_code: e.error_code,
+            error_message: e.error_message
           )
-          handle_response(response, 'Invitation sent successfully')
-        end
-
-        # Process the authenticate
-        def process_authenticate(magic_links_token)
-          log_action('Authenticate', magic_links_token: magic_links_token)
-          response = @client.magic_links.authenticate(magic_links_token: magic_links_token)
-          handle_response(response, 'Magic Link authenticated successfully')
         end
 
         private

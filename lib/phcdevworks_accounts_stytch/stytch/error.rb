@@ -6,15 +6,20 @@ module PhcdevworksAccountsStytch
       attr_reader :status_code, :error_code, :error_message, :cause, :original_error
 
       # Initialize the error
-      def initialize(status_code: 500, error_code: 'unknown_error', error_message: 'An unknown error occurred', cause: nil,
-                     original_error: nil)
+      def initialize(
+        status_code: 500,
+        error_code: 'unknown_error',
+        error_message: 'An unknown error occurred',
+        cause: nil,
+        original_error: nil
+      )
         @status_code = status_code
         @error_code = error_code
         @error_message = error_message
         @cause = cause
         @original_error = original_error
-        log_error
         super(build_message)
+        log_error
       end
 
       # Wrap a Stytch-specific error
@@ -22,7 +27,7 @@ module PhcdevworksAccountsStytch
         new(
           status_code: error.respond_to?(:status_code) ? error.status_code : 500,
           error_code: error.respond_to?(:error_code) ? error.error_code : 'stytch_error',
-          error_message: error.message,
+          error_message: error.message || 'An unknown Stytch error occurred',
           original_error: error
         )
       end
@@ -58,8 +63,7 @@ module PhcdevworksAccountsStytch
 
       # Build the error message
       def build_message
-        message = 'Stytch Error'
-        message += " (Status Code: #{@status_code})" if @status_code
+        message = "Stytch Error (Status Code: #{@status_code})"
         message += " - Code: #{@error_code}" if @error_code
         message += " - Message: #{@error_message}" if @error_message
         message += " - Cause: #{@cause.message}" if @cause

@@ -12,13 +12,19 @@ module OrganizationSetter
 
   # Set organization based on the slug
   def set_organization
+    return if params[:organization_slug].blank? && action_name == 'process_login_or_signup'
+
     slug = params[:organization_slug]
     if slug.blank?
       handle_missing_params_error('Organization slug is required')
       return
     end
 
-    @organization_id = fetch_organization_id(slug)
+    @organization_id = organization_service.find_organization_id_by_slug(slug)
+  rescue PhcdevworksAccountsStytch::Stytch::Error => e
+    handle_missing_params_error("Stytch Error - #{e.error_message}")
+  rescue StandardError => e
+    handle_missing_params_error(e.message)
   end
 
   # Fetch organization ID based on slug
