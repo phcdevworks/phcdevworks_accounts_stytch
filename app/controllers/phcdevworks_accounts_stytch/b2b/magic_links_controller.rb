@@ -6,15 +6,18 @@ module PhcdevworksAccountsStytch
       include ErrorHandler
       include OrganizationSetter
       include HandleServiceAction
+
       before_action :set_organization, only: %i[process_invite]
 
       # Process Login or Signup
       def process_login_or_signup
         if params[:email].blank?
+          Rails.logger.warn 'Login/Signup attempt failed: Missing email parameter'
           render json: { error: 'Email is required' }, status: :unprocessable_entity
           return
         end
 
+        Rails.logger.info "Processing Login or Signup for email: #{params[:email]}"
         handle_service_action(:login_or_signup) do
           service.process_login_or_signup(params[:email], @organization_id)
         end
@@ -33,10 +36,12 @@ module PhcdevworksAccountsStytch
                     else
                       "#{missing_params.to_sentence(last_word_connector: ', and ')} are required"
                     end
+          Rails.logger.warn "Invite attempt failed: #{message}"
           render json: { error: message }, status: :unprocessable_entity
           return
         end
 
+        Rails.logger.info "Processing invite for email: #{params[:email]} in organization: #{@organization_id}"
         handle_service_action(:invite) do
           service.process_invite(params[:email], @organization_id, params[:session_token])
         end
@@ -45,19 +50,15 @@ module PhcdevworksAccountsStytch
       # Process Revoke Invite
       def process_revoke_invite
         if params[:email].blank?
+          Rails.logger.warn 'Revoke invite attempt failed: Missing email parameter'
           render json: { error: 'Email is required to revoke invite' }, status: :unprocessable_entity
           return
         end
 
+        Rails.logger.info "Processing revoke invite for email: #{params[:email]} in organization: #{@organization_id}"
         handle_service_action(:revoke_invite) do
           service.process_revoke_invite(params[:email], @organization_id)
         end
-      rescue PhcdevworksAccountsStytch::Stytch::Error => e
-        render json: {
-          error: "Stytch Error (Status Code: #{e.status_code}) - Code: #{e.error_code} - Message: #{e.error_message}",
-          code: e.error_code,
-          details: e.to_h
-        }, status: e.status_code
       end
 
       private

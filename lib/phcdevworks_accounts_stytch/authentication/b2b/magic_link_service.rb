@@ -16,49 +16,58 @@ module PhcdevworksAccountsStytch
             email_address: email
           )
           handle_response(response, 'User logged in or signed up successfully')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          raise e
+        rescue StandardError => e
+          raise handle_unexpected_error(e)
         end
 
-        # Process the invite
+        # Process the revoke invite
         def process_revoke_invite(email, organization_id)
-          log_action('Revoke Invite', email: email, organization_id: organization_id)
-          response = @client.magic_links.revoke(email: email, organization_id: organization_id)
-          handle_response(response, 'Invite revoked successfully')
-        rescue SomeStytchSpecificError => e
-          # Map the error code to a not-found status
-          raise PhcdevworksAccountsStytch::Stytch::Error.new(
-            status_code: e.error_code == 'invite_not_found' ? 404 : 400,
-            error_code: e.error_code,
-            error_message: e.error_message
+          validate_revoke_invite_params!(email, organization_id)
+
+          response = @client.magic_links.email.revoke_invite(
+            email_address: email,
+            organization_id: organization_id
           )
+          handle_response(response, 'Invite successfully revoked')
+        rescue PhcdevworksAccountsStytch::Stytch::Error => e
+          raise e
+        rescue StandardError => e
+          raise handle_unexpected_error(e)
         end
 
         private
 
-        # Handle the response
+        def validate_revoke_invite_params!(email, organization_id)
+          raise ArgumentError, 'Email is required' if email.blank?
+          raise ArgumentError, 'Organization ID is required' if organization_id.blank?
+        end
+
         def handle_response(response, success_message)
-          PhcdevworksAccountsStytch::Stytch::Response.handle_response(response).tap do |result|
-            Rails.logger.info(success_message)
+          unless response[:status_code] == 200
+            raise PhcdevworksAccountsStytch::Stytch::Error.new(
+              status_code: response[:status_code],
+              error_code: response[:error_code] || 'unknown_error',
+              error_message: response[:error_message] || 'An unknown error occurred'
+            )
           end
-        rescue PhcdevworksAccountsStytch::Stytch::Error => e
-          handle_stytch_error(e)
+
+          Rails.logger.info(success_message)
+          response
         end
 
-        # Build the method options
-        def build_method_options(session_token)
-          PhcdevworksAccountsStytch::Stytch::MethodOptions.new(
-            authorization: { session_token: session_token }
-          )
-        end
-
-        # Log the action
         def log_action(action_name, details = {})
           Rails.logger.info "Starting #{action_name} with details: #{details.inspect}"
         end
 
-        # Handle Stytch-specific errors
-        def handle_stytch_error(error)
-          Rails.logger.error "Stytch Error: #{error.message} (Code: #{error.error_code}, Status: #{error.status_code})"
-          raise
+        def handle_unexpected_error(error)
+          Rails.logger.error "Unexpected Error: #{error.message} - Backtrace: #{error.backtrace.take(5).join("\n")}"
+          PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: 500,
+            error_message: 'An unexpected error occurred',
+            original_error: error
+          )
         end
       end
     end

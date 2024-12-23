@@ -13,9 +13,9 @@ module PhcdevworksAccountsStytch
         cause: nil,
         original_error: nil
       )
-        @status_code = status_code
-        @error_code = error_code
-        @error_message = error_message
+        @status_code = status_code || 500
+        @error_code = error_code || 'unknown_error'
+        @error_message = error_message || 'An unknown error occurred'
         @cause = cause
         @original_error = original_error
         super(build_message)
@@ -27,7 +27,7 @@ module PhcdevworksAccountsStytch
         new(
           status_code: error.respond_to?(:status_code) ? error.status_code : 500,
           error_code: error.respond_to?(:error_code) ? error.error_code : 'stytch_error',
-          error_message: error.message || 'An unknown Stytch error occurred',
+          error_message: error.respond_to?(:message) && error.message ? error.message : 'An unknown Stytch error occurred',
           original_error: error
         )
       end
@@ -35,9 +35,9 @@ module PhcdevworksAccountsStytch
       # Serialize the error to a hash
       def to_h
         {
-          status_code: @status_code,
-          error_code: @error_code,
-          error_message: @error_message,
+          status_code: @status_code || 500,
+          error_code: @error_code || 'unknown_error',
+          error_message: @error_message || 'An unknown error occurred',
           cause: @cause&.message,
           original_error: original_error_details
         }
@@ -57,7 +57,7 @@ module PhcdevworksAccountsStytch
         {
           class: @original_error.class.name,
           message: @original_error.message,
-          backtrace: @original_error.backtrace&.first(5) # Limit backtrace to the first 5 lines
+          backtrace: @original_error.backtrace&.first(5)
         }
       end
 
@@ -66,13 +66,15 @@ module PhcdevworksAccountsStytch
         message = "Stytch Error (Status Code: #{@status_code})"
         message += " - Code: #{@error_code}" if @error_code
         message += " - Message: #{@error_message}" if @error_message
-        message += " - Cause: #{@cause.message}" if @cause
+        message += " - Cause: #{@cause&.message}" if @cause
         message
       end
 
       # Log the error
       def log_error
         Rails.logger.error(build_message) if defined?(Rails)
+      rescue StandardError => e
+        warn "Failed to log Stytch error: #{e.message}"
       end
     end
   end
