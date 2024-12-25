@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module PhcdevworksAccountsStytch
-  VERSION = '0.2.0.pre.1'
+  VERSION = "0.1.0"
 end
