@@ -5,8 +5,8 @@ require_relative 'lib/phcdevworks_accounts_stytch/version'
 Gem::Specification.new do |spec|
   spec.name        = 'phcdevworks_accounts_stytch'
   spec.version     = PhcdevworksAccountsStytch::VERSION
-  spec.authors     = ['PHCDevworks', 'Brad Potts']
-  spec.email       = ['info@phcdevworks.com', 'brad.potts@phcdevworks.com']
+  spec.authors     = [ 'PHCDevworks', 'Brad Potts' ]
+  spec.email       = [ 'info@phcdevworks.com', 'brad.potts@phcdevworks.com' ]
   spec.homepage    = 'https://phcdevworks.com/'
   spec.summary     = 'Rails Engine for Stytch Authentication'
   spec.description = 'PHCDevworks Accounts Stytch is a Ruby on Rails Engine for Stytch Authentication.'
