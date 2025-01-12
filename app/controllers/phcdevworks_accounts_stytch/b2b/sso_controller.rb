@@ -5,11 +5,14 @@ module PhcdevworksAccountsStytch
 
       # POST /phcdevworks_accounts_stytch/b2b/:organization_slug/sso/authenticate
       def authenticate
+        if params[:organization_slug].blank?
+          render json: { error: "organization_slug is required" }, status: :bad_request
+          return
+        end
+
         result = @service.handle_request do
           @service.client.sso.authenticate(
-            organization_slug: params[:organization_slug],
-            connection_id: params[:connection_id],
-            idp_response: params[:idp_response]
+            sso_token: params[:sso_token] # Pass the correct sso_token here
           )
         end
         render json: result.to_h, status: :ok
