@@ -5,35 +5,36 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::SsoController, type: :controller 
   let(:valid_params) do
     {
       organization_slug: organization_slug,
-      connection_id: 'saml-connection-test-51861cbc-d3b9-428b-9761-227f5fb12be9',
-      idp_response: 'mocked-saml-response'
+      sso_token: 'mocked-sso-token'
     }
   end
 
   let(:mock_success_response) do
-    PhcdevworksAccountsStytch::Stytch::Success.new(
-      status_code: 200,
-      message: 'Success',
+    {
+      http_status_code: 200,
       data: { session_token: 'mock-session-token', member_id: 'member-1234' }
-    )
+    }
   end
 
   let(:mock_error_response) do
-    PhcdevworksAccountsStytch::Stytch::Error.new(
-      status_code: 401,
-      error_code: 'authentication_failed',
-      error_message: 'Invalid SSO response'
-    )
+    {
+      http_status_code: 401,
+      stytch_api_error: {
+        error_type: 'authentication_failed',
+        error_message: 'Invalid SSO response'
+      }
+    }
   end
 
   describe 'POST /phcdevworks_accounts_stytch/b2b/:organization_slug/sso/authenticate' do
-    context 'when the request is successful' do
-      before do
-        allow_any_instance_of(PhcdevworksAccountsStytch::Authentication::B2b::SsoService)
-          .to receive(:handle_request)
-          .and_return(mock_success_response)
-      end
+    before do
+      allow_any_instance_of(PhcdevworksAccountsStytch::Authentication::B2b::SsoService).to receive(:client)
+        .and_return(double('StytchB2B::Client', sso: sso_double))
+    end
 
+    let(:sso_double) { double('SSO', authenticate: mock_success_response) }
+
+    context 'when the request is successful' do
       it 'returns a 200 status and success data' do
         post :authenticate, params: valid_params
         expect(response).to have_http_status(:ok)
@@ -44,13 +45,16 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::SsoController, type: :controller 
     end
 
     context 'when the request fails' do
-      before do
-        allow_any_instance_of(PhcdevworksAccountsStytch::Authentication::B2b::SsoService)
-          .to receive(:handle_request)
-          .and_raise(mock_error_response)
-      end
+      let(:sso_double) { double('SSO', authenticate: mock_error_response) }
 
       it 'returns the error status and message' do
+        allow(sso_double).to receive(:authenticate).and_raise(
+          PhcdevworksAccountsStytch::Stytch::Error.new(
+            status_code: 401,
+            error_code: 'authentication_failed',
+            error_message: 'Invalid SSO response'
+          )
+        )
         post :authenticate, params: valid_params
         expect(response).to have_http_status(401)
         json_response = JSON.parse(response.body)
@@ -60,9 +64,18 @@ RSpec.describe PhcdevworksAccountsStytch::B2b::SsoController, type: :controller 
       end
     end
 
-    context 'when organization_slug is missing or blank' do
+    context 'when organization_slug is blank' do
       it 'returns a 400 status with an error message' do
         post :authenticate, params: valid_params.merge(organization_slug: '')
+        expect(response).to have_http_status(:bad_request)
+        json_response = JSON.parse(response.body)
+        expect(json_response['error']).to eq('organization_slug is required')
+      end
+    end
+
+    context 'when organization_slug is invalid or missing' do
+      it 'returns a 400 status with an error message' do
+        post :authenticate, params: valid_params.merge(organization_slug: '_invalid_')
         expect(response).to have_http_status(:bad_request)
         json_response = JSON.parse(response.body)
         expect(json_response['error']).to eq('organization_slug is required')
