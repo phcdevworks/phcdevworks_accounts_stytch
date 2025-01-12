@@ -12,6 +12,8 @@ Rails.application.routes.draw do
         post "passwords/create", to: "passwords#create", as: :password_create
         post "passwords/authenticate", to: "passwords#authenticate", as: :password_authenticate
         post "passwords/reset", to: "passwords#reset", as: :password_reset
+
+        post "sso/authenticate", to: "sso#authenticate"
       end
     end
   end
